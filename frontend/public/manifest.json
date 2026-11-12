@@ -1,0 +1,23 @@
+{
+  "name": "Frontline Safety & Skills LMS",
+  "short_name": "Frontline LMS",
+  "description": "Mobile-first vocational & safety microlearning for the frontline workforce",
+  "start_url": "/worker/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+

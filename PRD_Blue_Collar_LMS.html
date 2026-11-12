@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRD - Blue-Collar LMS (JavaScript Full-Stack Architecture)</title>
+  <style>
+    :root {
+      --primary: #0f3d7a;
+      --primary-accent: #2563eb;
+      --secondary: #0d9488;
+      --dark: #0f172a;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #334155;
+      --text-muted: #64748b;
+      --frontend-color: #0284c7;
+      --backend-color: #7c3aed;
+      --success: #16a34a;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.65;
+      color: var(--text);
+      background-color: var(--bg);
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 52px;
+      border-radius: 12px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .btn-print {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--primary-accent);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-print:hover {
+      background-color: #1d4ed8;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    .status-tag {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .prd-header {
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 24px;
+      margin-bottom: 36px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--dark);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      background: #f8fafc;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    h2 {
+      font-size: 1.55rem;
+      color: var(--dark);
+      margin-top: 40px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      color: var(--primary);
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-bottom: 16px;
+    }
+
+    ul, ol {
+      margin-bottom: 20px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background-color: #f1f5f9;
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .section-banner {
+      padding: 14px 20px;
+      border-radius: 8px;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 32px 0 20px 0;
+    }
+
+    .banner-frontend {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+    }
+
+    .banner-backend {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    }
+
+    .page-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 18px;
+      border-left: 5px solid var(--primary-accent);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .page-card.frontend {
+      border-left-color: var(--frontend-color);
+    }
+
+    .page-card.backend {
+      border-left-color: var(--backend-color);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .route-badge {
+      font-family: monospace;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      margin: 20px 0;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .top-bar {
+        display: none;
+      }
+      h2, h3 {
+        page-break-after: avoid;
+      }
+      .page-card, table, pre {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-bar">
+      <span class="status-tag">Architecture: Decoupled JavaScript / TypeScript Full-Stack</span>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        Save / Print as PDF
+      </button>
+    </div>
+
+    <header class="prd-header">
+      <h1>Product Requirements Document (PRD)</h1>
+      <p class="subtitle">Frontline & Blue-Collar LMS — Pure JavaScript / TypeScript Architecture</p>
+      <div class="meta-bar">
+        <span><strong>Document Version:</strong> 1.1.0</span>
+        <span><strong>Backend:</strong> Node.js + Express (TypeScript)</span>
+        <span><strong>Frontend:</strong> Next.js 14+ PWA + Admin Portal</span>
+        <span><strong>Database:</strong> Prisma ORM (SQLite / PostgreSQL)</span>
+      </div>
+    </header>
+
+    <!-- SECTION 1: STRUCTURE -->
+    <section>
+      <h2>1. Project Directory & File Structure</h2>
+      <p>The system is organized into a clean decoupled structure where the <strong>Frontend</strong> and <strong>Backend</strong> are separate directories sharing unified TypeScript types:</p>
+
+      <pre><code>LMS/
+├── backend/                             # [BACKEND - Node.js, Express & TypeScript]
+│   ├── prisma/
+│   │   ├── schema.prisma                # Database Models (Users, Modules, Quizzes, Audits)
+│   │   └── seed.ts                      # Seed data for 5 core training pillars
+│   ├── src/
+│   │   ├── controllers/                 # Express Request Handlers
+│   │   │   ├── auth.controller.ts       # Phone OTP & QR Badge scan logins
+│   │   │   ├── module.controller.ts     # Video lessons, audio tracks, and courses
+│   │   │   ├── quiz.controller.ts       # "Spot the Hazard" & visual quizzes
+│   │   │   ├── sync.controller.ts       # Offline sync queue & conflict resolver
+│   │   │   ├── supervisor.controller.ts # Toolbox Talk attendance & practical audits
+│   │   │   └── admin.controller.ts      # Compliance matrix & OSHA audit exports
+│   │   ├── routes/                      # REST API Endpoints (/api/v1/...)
+│   │   ├── services/                    # Business Logic (QR generation, sync engine)
+│   │   ├── middlewares/                 # Auth verification & role checks
+│   │   ├── db/prisma.ts                 # Prisma singleton instance
+│   │   └── server.ts                    # Server initialization
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend/                            # [FRONTEND - Next.js 14+ PWA & Admin Portal]
+│   ├── public/manifest.json             # PWA Web Manifest & App Icons
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── (worker)/                # Worker PWA Screens (Login, Dashboard, Quiz, QR)
+│   │   │   ├── (supervisor)/            # Supervisor Tablet Screens (Toolbox, Checkoffs)
+│   │   │   ├── (admin)/                 # Admin Screens (Compliance Matrix, Builder)
+│   │   ├── components/                  # Touch UI (HazardCanvas, AudioNarrator, QRScanner)
+│   │   └── lib/                         # IndexedDB (Dexie.js) & Offline Sync Worker
+│   ├── package.json
+│   └── tailwind.config.ts
+│
+└── shared/                              # [SHARED TYPES]
+    └── types.ts                         # Shared TypeScript interfaces</code></pre>
+    </section>
+
+    <!-- SECTION 2: FRONTEND PAGES -->
+    <section>
+      <h2>2. Frontend Pages Breakdown (Worker & Field Facing)</h2>
+      <div class="section-banner banner-frontend">
+        <span>📱 FRONT-END PAGES: WORKER MOBILE PWA</span>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-1: Welcome & Zero-Email Authentication</h4>
+          <span class="route-badge">/worker/login</span>
+        </div>
+        <p>Worker logs in via phone number + SMS/WhatsApp 4-digit OTP or by scanning their physical employee QR badge with their camera. Includes regional language audio selector.</p>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-2: Worker Home & Daily Shift Dashboard</h4>
+          <span class="route-badge">/worker/dashboard</span>
+        </div>
+        <p>Displays today's required 2-minute safety bite, floating "Listen in My Language" text-to-speech button, and quick-action buttons for QR scanner and offline downloads.</p>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-3: Microlearning Video Player</h4>
+          <span class="route-badge">/worker/learn/[id]</span>
+        </div>
+        <p>High-speed video stream with dual-language audio selector (switch voiceover without re-downloading video) and split-screen <em>Wrong Way ❌ vs. Right Way ✔️</em> demos.</p>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-4: Interactive Visual Quiz</h4>
+          <span class="route-badge">/worker/quiz/[id]</span>
+        </div>
+        <p>"Spot the Hazard" interactive tap canvas (tap 3 hazards on the worksite image) and swipe flashcard decision engine (Swipe right = Safe, Swipe left = Unsafe).</p>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-5: Machine Just-in-Time (JIT) QR Scanner</h4>
+          <span class="route-badge">/worker/scan</span>
+        </div>
+        <p>Camera viewfinder scanning QR stickers on physical machinery to trigger a 45-second machine pre-operation SOP video on the spot.</p>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-6: My Skill Passport & Certifications</h4>
+          <span class="route-badge">/worker/passport</span>
+        </div>
+        <p>Displays earned digital safety badges (Forklift, Fire PASS, Chemical HazCom) with color-coded active/expiring indicators.</p>
+      </div>
+
+      <div class="page-card frontend">
+        <div class="page-header">
+          <h4>Page F-7: Offline Cache & Sync Manager</h4>
+          <span class="route-badge">/worker/offline</span>
+        </div>
+        <p>One-click "Download Today's Shift Modules" button (~25 MB total) and queue status for offline quiz results waiting to sync.</p>
+      </div>
+    </section>
+
+    <!-- SECTION 3: BACKEND PAGES -->
+    <section>
+      <h2>3. Backend Pages Breakdown (Supervisor & Admin Facing)</h2>
+      <div class="section-banner banner-backend">
+        <span>💻 BACK-END PAGES: SUPERVISOR & ADMIN PORTAL</span>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-1: Admin & Supervisor Secure Login</h4>
+          <span class="route-badge">/admin/login</span>
+        </div>
+        <p>Enterprise credentials with Two-Factor Authentication (2FA) and automatic role routing to Supervisor or Admin dashboards.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-2: Supervisor Crew & Shift Dashboard</h4>
+          <span class="route-badge">/supervisor/dashboard</span>
+        </div>
+        <p>Real-time shift roster showing total crew count, certified workers, and pending training alerts before shift kickoff.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-3: Supervisor "Toolbox Talk" Group Mode</h4>
+          <span class="route-badge">/supervisor/toolbox</span>
+        </div>
+        <p>Fullscreen tablet player to stream the morning safety drill to an assembled 15–30 person crew with 1-click bulk attendance confirmation.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-4: Supervisor Practical On-the-Job Verification</h4>
+          <span class="route-badge">/supervisor/practical</span>
+        </div>
+        <p>Hands-on 30-second observation checklist with digital supervisor signature capture to confirm physical competency.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-5: EHS Safety & Compliance Matrix Dashboard</h4>
+          <span class="route-badge">/admin/compliance</span>
+        </div>
+        <p>Plant-wide heatmap matrix showing training completion by plant location, department, and shift, with critical safety violation alerts.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-6: Course, Video & Visual Quiz Builder</h4>
+          <span class="route-badge">/admin/builder</span>
+        </div>
+        <p>No-code authoring editor to upload videos, link multilingual audio tracks, and draw bounding boxes for "Spot the Hazard" coordinates.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-7: Machine Asset & Printable QR Code Generator</h4>
+          <span class="route-badge">/admin/assets</span>
+        </div>
+        <p>Equipment registry generating printable weatherproof QR stickers for shop-floor machinery.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-8: Workforce Roster & Digital ID Badge Management</h4>
+          <span class="route-badge">/admin/roster</span>
+        </div>
+        <p>Employee profiles and batch printer for wallet-sized employee ID cards with login QR codes.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-9: Regulatory Compliance & One-Click Audit Export</h4>
+          <span class="route-badge">/admin/audit</span>
+        </div>
+        <p>Generates 1-click OSHA-compliant PDF audit dossiers with timestamps and digital signatures, plus 30-day license expiration alerts.</p>
+      </div>
+
+      <div class="page-card backend">
+        <div class="page-header">
+          <h4>Page B-10: System Settings & Integrations</h4>
+          <span class="route-badge">/admin/settings</span>
+        </div>
+        <p>SMS/WhatsApp gateway configuration, offline cache limits, and external payroll webhooks.</p>
+      </div>
+    </section>
+
+    <!-- SECTION 4: API ENDPOINTS -->
+    <section>
+      <h2>4. Backend RESTful API Specification (Node.js & Express)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>API Endpoint</th>
+            <th>Method</th>
+            <th>Role</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/api/v1/auth/otp/send</code></td>
+            <td>POST</td>
+            <td>Public</td>
+            <td>Sends 4-digit SMS / WhatsApp OTP to worker phone.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/auth/otp/verify</code></td>
+            <td>POST</td>
+            <td>Public</td>
+            <td>Validates OTP and issues session token.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/auth/qr-login</code></td>
+            <td>POST</td>
+            <td>Public</td>
+            <td>Authenticates worker directly via badge QR code.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/modules</code></td>
+            <td>GET</td>
+            <td>Worker/Sup</td>
+            <td>Lists assigned microlearning modules with multilingual audio.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/modules/:id</code></td>
+            <td>GET</td>
+            <td>Worker/Sup</td>
+            <td>Fetches single module details, video stream, and quizzes.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/sync/completions</code></td>
+            <td>POST</td>
+            <td>Worker</td>
+            <td>Receives batch of offline quiz completions and updates database.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/supervisor/toolbox</code></td>
+            <td>POST</td>
+            <td>Supervisor</td>
+            <td>Submits bulk attendance for morning group safety drill.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/supervisor/practical</code></td>
+            <td>POST</td>
+            <td>Supervisor</td>
+            <td>Records practical observation checklist and supervisor signature.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/admin/compliance-matrix</code></td>
+            <td>GET</td>
+            <td>Admin</td>
+            <td>Aggregates compliance percentages by plant, shift, and department.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/admin/assets/generate-qr</code></td>
+            <td>POST</td>
+            <td>Admin</td>
+            <td>Generates printable QR sticker sheets for equipment.</td>
+          </tr>
+          <tr>
+            <td><code>/api/v1/admin/reports/audit-pdf</code></td>
+            <td>GET</td>
+            <td>Admin</td>
+            <td>Generates legally verifiable OSHA compliance PDF audit dossier.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer style="margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+      Frontline & Blue-Collar LMS • PRD v1.1.0 • Pure JavaScript/TypeScript Full-Stack
+    </footer>
+  </div>
+
+</body>
+</html>

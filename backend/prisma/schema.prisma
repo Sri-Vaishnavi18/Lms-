@@ -1,0 +1,89 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String           @id @default(uuid())
+  phoneNumber       String           @unique
+  badgeId           String           @unique
+  fullName          String
+  role              String           @default("WORKER") // WORKER, SUPERVISOR, ADMIN
+  preferredLanguage String           @default("en")
+  siteLocation      String           @default("Plant Alpha - Main Site")
+  department        String           @default("Operations")
+  completions       Completion[]
+  supervisorAudits  PracticalAudit[] @relation("SupervisorAudits")
+  workerAudits      PracticalAudit[] @relation("WorkerAudits")
+  createdAt         DateTime         @default(now())
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  category    String   // EHS, MACHINE_SOP, QUALITY_5S, CONDUCT, DIGITAL_LITERACY
+  modules     Module[]
+  createdAt   DateTime @default(now())
+}
+
+model Module {
+  id              String       @id @default(uuid())
+  courseId        String
+  course          Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title           String
+  durationSeconds Int
+  videoUrl        String
+  audioTracks     String       // JSON-stringified: {"en": "/audio/en/...", "hi": "/audio/hi/..."}
+  quizzes         Quiz[]
+  completions     Completion[]
+  createdAt       DateTime     @default(now())
+}
+
+model Quiz {
+  id           String   @id @default(uuid())
+  moduleId     String
+  module       Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  type         String   // SPOT_THE_HAZARD, SWIPE_DECISION, SEQUENCE_ORDER
+  promptAudio  String   // JSON-stringified: {"en": "...", "hi": "..."}
+  questionData String   // JSON-stringified: { imageUrl, hazardTargets, swipeCards }
+  createdAt    DateTime @default(now())
+}
+
+model Completion {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleId        String
+  module          Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  score           Int
+  isPassed        Boolean  @default(false)
+  completedAt     DateTime @default(now())
+  isOfflineSynced Boolean  @default(false)
+}
+
+model PracticalAudit {
+  id            String   @id @default(uuid())
+  workerId      String
+  worker        User     @relation("WorkerAudits", fields: [workerId], references: [id], onDelete: Cascade)
+  supervisorId  String
+  supervisor    User     @relation("SupervisorAudits", fields: [supervisorId], references: [id], onDelete: Cascade)
+  checklistName String
+  passed        Boolean
+  notes         String?
+  signatureUrl  String
+  verifiedAt    DateTime @default(now())
+}
+
+model MachineAsset {
+  id             String   @id @default(uuid())
+  qrCodeId       String   @unique
+  name           String
+  plantLocation  String
+  linkedModuleId String
+  createdAt      DateTime @default(now())
+}
+
