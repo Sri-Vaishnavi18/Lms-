@@ -3,9 +3,12 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting Blue-Collar LMS Database Seeding...');
+  console.log('🌱 Starting LMS 360 Database Seeding with 7 Sectors, Live Sessions & Assignments...');
 
   // Clean existing data
+  await prisma.attendance.deleteMany();
+  await prisma.assignmentSubmission.deleteMany();
+  await prisma.assignment.deleteMany();
   await prisma.completion.deleteMany();
   await prisma.practicalAudit.deleteMany();
   await prisma.quiz.deleteMany();
@@ -14,16 +17,21 @@ async function main() {
   await prisma.machineAsset.deleteMany();
   await prisma.user.deleteMany();
 
-  // 1. Create Core Users
+  // 1. Create Core Users Across 7 Sectors
   const worker1 = await prisma.user.create({
     data: {
       phoneNumber: '+919876543210',
       badgeId: 'BC-1001',
       fullName: 'Ramesh Kumar',
       role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'CONSTRUCTION',
+      trade: 'Mason & Scaffolder',
+      skillTier: 'SKILLED',
       preferredLanguage: 'hi', // Hindi
-      siteLocation: 'Plant Alpha - Main Assembly',
-      department: 'Heavy Assembly',
+      siteLocation: 'Metro Rail Project Site 4',
+      department: 'Civil Infrastructure',
     },
   });
 
@@ -33,9 +41,14 @@ async function main() {
       badgeId: 'BC-1002',
       fullName: 'Suresh Patel',
       role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'LOGISTICS',
+      trade: 'Forklift Operator',
+      skillTier: 'SEMI_SKILLED',
       preferredLanguage: 'en',
-      siteLocation: 'Plant Alpha - Main Assembly',
-      department: 'Logistics & Warehouse',
+      siteLocation: 'Central Fulfillment Hub',
+      department: 'Warehouse & Yard Logistics',
     },
   });
 
@@ -45,9 +58,82 @@ async function main() {
       badgeId: 'BC-1003',
       fullName: 'Anil Verma',
       role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'MANUFACTURING',
+      trade: '5-Axis CNC Mill Operator',
+      skillTier: 'HIGHLY_SKILLED',
       preferredLanguage: 'hi',
       siteLocation: 'Plant Alpha - Main Assembly',
-      department: 'Heavy Assembly',
+      department: 'Precision Machining',
+    },
+  });
+
+  const worker4 = await prisma.user.create({
+    data: {
+      phoneNumber: '+919876543213',
+      badgeId: 'BC-1004',
+      fullName: 'Pooja Sharma',
+      role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'SKILLED_TECHNICAL',
+      trade: 'High Voltage Electrician & HVAC',
+      skillTier: 'SKILLED',
+      preferredLanguage: 'hi',
+      siteLocation: 'Substation Gamma',
+      department: 'Electrical & Utilities',
+    },
+  });
+
+  const worker5 = await prisma.user.create({
+    data: {
+      phoneNumber: '+919876543214',
+      badgeId: 'BC-1005',
+      fullName: 'Balwant Singh',
+      role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'AGRICULTURE',
+      trade: 'Harvester & Tractor Specialist',
+      skillTier: 'SEMI_SKILLED',
+      preferredLanguage: 'pa',
+      siteLocation: 'Agri-Zone North Sector',
+      department: 'Heavy Machinery Harvesting',
+    },
+  });
+
+  const worker6 = await prisma.user.create({
+    data: {
+      phoneNumber: '+919876543215',
+      badgeId: 'BC-1006',
+      fullName: 'Sunita Devi',
+      role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'CLEANING_MAINTENANCE',
+      trade: 'Sanitation & HazCom Technician',
+      skillTier: 'UNSKILLED',
+      preferredLanguage: 'hi',
+      siteLocation: 'Cleanroom Complex Beta',
+      department: 'Sanitation & Facility Care',
+    },
+  });
+
+  const worker7 = await prisma.user.create({
+    data: {
+      phoneNumber: '+919876543216',
+      badgeId: 'BC-1007',
+      fullName: 'Mohammed Rafiq',
+      role: 'WORKER',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'HOSPITALITY_SERVICE',
+      trade: 'Commercial Kitchen Steward',
+      skillTier: 'SEMI_SKILLED',
+      preferredLanguage: 'ta',
+      siteLocation: 'Corporate Dining Hall',
+      department: 'Culinary & Food Safety',
     },
   });
 
@@ -57,9 +143,14 @@ async function main() {
       badgeId: 'SUP-5001',
       fullName: 'David Miller (Shift Foreman)',
       role: 'SUPERVISOR',
+      status: 'ACTIVE',
+      password: '1234',
+      sector: 'MANUFACTURING',
+      trade: 'Shift Supervisor',
+      skillTier: 'HIGHLY_SKILLED',
       preferredLanguage: 'en',
       siteLocation: 'Plant Alpha - Main Assembly',
-      department: 'Operations & Safety',
+      department: 'Heavy Assembly & Operations',
     },
   });
 
@@ -69,227 +160,277 @@ async function main() {
       badgeId: 'ADM-9001',
       fullName: 'Sarah Jenkins (EHS Lead)',
       role: 'ADMIN',
+      status: 'ACTIVE',
+      password: 'admin123',
+      sector: 'MANUFACTURING',
+      trade: 'Safety Director',
+      skillTier: 'HIGHLY_SKILLED',
       preferredLanguage: 'en',
       siteLocation: 'Corporate HQ & Plant Alpha',
       department: 'Environmental Health & Safety',
     },
   });
 
-  console.log('✅ Created 5 Core Users (Workers, Supervisor, Admin)');
+  console.log('✅ Created 9 Core Users across all 7 Sectors + Supervisor & Admin');
 
-  // 2. Create Pillar 1: Environment, Health & Safety (EHS)
-  const ehsCourse = await prisma.course.create({
+  // 2. Create Courses across Sectors with Skill Tiers
+  const courseConstruction = await prisma.course.create({
     data: {
-      title: 'Workplace Safety & Hazard Control (EHS)',
+      title: 'Scaffolding & Working at Heights Safety 2026',
       category: 'EHS',
-      modules: {
-        create: [
-          {
-            title: 'Personal Protective Equipment (PPE) & Fall Harness',
-            durationSeconds: 135, // 2m 15s
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-            audioTracks: JSON.stringify({
-              en: '/audio/en/ppe-harness.mp3',
-              hi: '/audio/hi/ppe-harness.mp3',
-              es: '/audio/es/ppe-harness.mp3',
-            }),
-            quizzes: {
-              create: [
-                {
-                  type: 'SPOT_THE_HAZARD',
-                  promptAudio: JSON.stringify({
-                    en: '/audio/en/quiz-spot-hazard.mp3',
-                    hi: '/audio/hi/quiz-spot-hazard.mp3',
-                  }),
-                  questionData: JSON.stringify({
-                    imageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1000&q=80',
-                    hazardTargets: [
-                      {
-                        id: 'hz-1',
-                        name: 'Unfastened Safety Harness Lanyard',
-                        xPercent: 48,
-                        yPercent: 42,
-                        radiusPercent: 12,
-                        explanation: 'Worker on scaffold has harness lanyard disconnected from life-line!',
-                      },
-                      {
-                        id: 'hz-2',
-                        name: 'Missing Hard Hat / Helmet',
-                        xPercent: 52,
-                        yPercent: 20,
-                        radiusPercent: 10,
-                        explanation: 'Worker under high scaffolding without hard hat.',
-                      },
-                      {
-                        id: 'hz-3',
-                        name: 'Exposed Electrical Cable on Wet Ground',
-                        xPercent: 25,
-                        yPercent: 82,
-                        radiusPercent: 14,
-                        explanation: 'Frayed wire lying in a water puddle creates electrocution hazard.',
-                      },
-                    ],
-                  }),
-                },
-              ],
-            },
-          },
-          {
-            title: 'Fire Safety & The P.A.S.S. Extinguisher Method',
-            durationSeconds: 110, // 1m 50s
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-            audioTracks: JSON.stringify({
-              en: '/audio/en/fire-pass.mp3',
-              hi: '/audio/hi/fire-pass.mp3',
-            }),
-            quizzes: {
-              create: [
-                {
-                  type: 'SWIPE_DECISION',
-                  promptAudio: JSON.stringify({
-                    en: '/audio/en/quiz-swipe-tools.mp3',
-                  }),
-                  questionData: JSON.stringify({
-                    swipeCards: [
-                      {
-                        id: 'sc-1',
-                        imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
-                        caption: 'Fire Extinguisher with pressure needle in GREEN zone and safety pin intact.',
-                        isSafe: true,
-                        explanation: 'Green zone indicates full operational pressure.',
-                      },
-                      {
-                        id: 'sc-2',
-                        imageUrl: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=600&q=80',
-                        caption: 'Fire hose with cracked rubber and missing spray nozzle.',
-                        isSafe: false,
-                        explanation: 'Damaged fire hose will rupture under pressure.',
-                      },
-                    ],
-                  }),
-                },
-              ],
-            },
-          },
-        ],
-      },
+      sector: 'CONSTRUCTION',
+      skillTier: 'UNSKILLED',
+      description: 'Foundational height safety, mandatory harness checks, and perimeter debris prevention.',
     },
   });
 
-  // 3. Create Pillar 2: Machine Operations & SOPs
-  const machineCourse = await prisma.course.create({
+  const courseMachining = await prisma.course.create({
     data: {
-      title: 'Machine Standard Operating Procedures (SOPs)',
+      title: 'CNC Mill & Stamping Press Lockout-Tagout (LOTO)',
       category: 'MACHINE_SOP',
-      modules: {
-        create: [
-          {
-            title: 'Forklift Pre-Shift Walkaround Check',
-            durationSeconds: 120,
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4',
-            audioTracks: JSON.stringify({
-              en: '/audio/en/forklift-sop.mp3',
-              hi: '/audio/hi/forklift-sop.mp3',
-            }),
-          },
-          {
-            title: 'Lockout / Tagout (LOTO) Zero-Energy Protocol',
-            durationSeconds: 150,
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-            audioTracks: JSON.stringify({
-              en: '/audio/en/loto-sop.mp3',
-              hi: '/audio/hi/loto-sop.mp3',
-            }),
-          },
-        ],
-      },
+      sector: 'MANUFACTURING',
+      skillTier: 'SKILLED',
+      description: 'Zero mechanical energy isolation, lockout padlock verification, and live safety checks.',
     },
   });
 
-  // 4. Create Pillar 3: Quality 5S
-  await prisma.course.create({
+  const courseLogistics = await prisma.course.create({
     data: {
-      title: '5S Shop Floor Organization & Defect Identification',
-      category: 'QUALITY_5S',
-      modules: {
-        create: [
-          {
-            title: '5S Daily Routine: Sort, Shine & Standardize',
-            durationSeconds: 95,
-            videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4',
-            audioTracks: JSON.stringify({
-              en: '/audio/en/5s-routine.mp3',
-            }),
-          },
-        ],
-      },
+      title: 'Counterbalance Forklift & Yard Safety Protocol',
+      category: 'MACHINE_SOP',
+      sector: 'LOGISTICS',
+      skillTier: 'SEMI_SKILLED',
+      description: 'Pre-shift horn/brake inspection, load center limits, and pedestrian blind spot management.',
     },
   });
 
-  console.log('✅ Created 3 Courses & 5 Microlearning Modules with Quizzes');
+  const courseLiveMasterclass = await prisma.course.create({
+    data: {
+      title: 'Plant Safety Live Masterclasses & Daily Toolbox Talks',
+      category: 'EHS',
+      sector: 'MANUFACTURING',
+      skillTier: 'HIGHLY_SKILLED',
+      description: 'Live interactive streaming sessions with master trainers and certified site engineers.',
+    },
+  });
 
-  // 5. Create Machine Assets for QR Triggers
-  const allModules = await prisma.module.findMany();
-  const forkliftModule = allModules.find((m) => m.title.includes('Forklift'));
-  const lotoModule = allModules.find((m) => m.title.includes('Lockout'));
+  // 3. Create Modules (Recorded and Live Sessions)
+  const modHeightSafety = await prisma.module.create({
+    data: {
+      courseId: courseConstruction.id,
+      title: '3-Point Contact & Fall Harness Pre-Use Check',
+      durationSeconds: 120,
+      sessionType: 'RECORDED',
+      sector: 'CONSTRUCTION',
+      skillTier: 'UNSKILLED',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      audioTracks: JSON.stringify({
+        en: '/audio/en/fire-pass.mp3',
+        hi: '/audio/hi/fire-pass.mp3',
+        ta: '/audio/ta/fire-pass.mp3',
+        te: '/audio/te/fire-pass.mp3',
+      }),
+    },
+  });
 
-  if (forkliftModule) {
-    await prisma.machineAsset.create({
-      data: {
-        qrCodeId: 'MACH-FORK-04',
-        name: 'High-Reach Electric Forklift #04',
-        plantLocation: 'Bay B - Warehouse Logistics',
-        linkedModuleId: forkliftModule.id,
-      },
-    });
-  }
+  const modForkliftRecorded = await prisma.module.create({
+    data: {
+      courseId: courseLogistics.id,
+      title: 'Forklift 45-Second Daily Pre-Shift Circle Check',
+      durationSeconds: 150,
+      sessionType: 'RECORDED',
+      sector: 'LOGISTICS',
+      skillTier: 'SEMI_SKILLED',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      audioTracks: JSON.stringify({
+        en: '/audio/en/fire-pass.mp3',
+        hi: '/audio/hi/fire-pass.mp3',
+      }),
+    },
+  });
 
-  if (lotoModule) {
-    await prisma.machineAsset.create({
-      data: {
-        qrCodeId: 'MACH-CNC-12',
-        name: '5-Axis Heavy CNC Mill #12',
-        plantLocation: 'Shop Floor 1 - Machining Line',
-        linkedModuleId: lotoModule.id,
-      },
-    });
-  }
+  const modLotoLive = await prisma.module.create({
+    data: {
+      courseId: courseMachining.id,
+      title: 'Live Workshop: High-Voltage LOTO & Stored Pressure Bleed',
+      durationSeconds: 1800,
+      sessionType: 'LIVE',
+      sector: 'MANUFACTURING',
+      skillTier: 'SKILLED',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      liveSessionUrl: 'https://meet.jit.si/LMS360-Live-Safety-Session',
+      liveStartTime: new Date(Date.now() + 2 * 60 * 60 * 1000), // In 2 hours
+      liveInstructor: 'Er. Rajesh Kulkarni (Chief Safety Inspector)',
+      audioTracks: JSON.stringify({ en: '/audio/en/fire-pass.mp3' }),
+    },
+  });
 
-  // 6. Record Initial Completion for Worker 1 (Ramesh)
-  const firstModule = allModules[0];
-  if (firstModule) {
-    await prisma.completion.create({
-      data: {
-        userId: worker1.id,
-        moduleId: firstModule.id,
-        score: 100,
-        isPassed: true,
-        isOfflineSynced: false,
-      },
-    });
+  const modToolboxLive = await prisma.module.create({
+    data: {
+      courseId: courseLiveMasterclass.id,
+      title: 'Morning Shift Toolbox Talk: Heat Stress & Chemical HazCom',
+      durationSeconds: 900,
+      sessionType: 'LIVE',
+      sector: 'CONSTRUCTION',
+      skillTier: 'SEMI_SKILLED',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
+      liveSessionUrl: 'https://meet.jit.si/LMS360-Shift-Toolbox-Live',
+      liveStartTime: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+      liveInstructor: 'David Miller (Shift Foreman)',
+      audioTracks: JSON.stringify({ en: '/audio/en/fire-pass.mp3' }),
+    },
+  });
 
-    await prisma.practicalAudit.create({
-      data: {
-        workerId: worker1.id,
-        supervisorId: supervisor.id,
-        checklistName: 'PPE & Safety Harness Physical Fit Check',
-        passed: true,
-        notes: 'Proper 3-point harness check observed before ascending.',
-        signatureUrl: 'data:image/svg+xml;utf8,<svg>Verified-DavidMiller</svg>',
-      },
-    });
-  }
+  // 4. Create Assignments for Modules
+  const assign1 = await prisma.assignment.create({
+    data: {
+      moduleId: modHeightSafety.id,
+      title: 'Fall Arrest Full-Body Harness Photo Verification',
+      type: 'PHOTO_PROOF',
+      instructions: 'Wear your full-body safety harness, latch the dorsal D-ring, and take a photo selfie in front of the site safety mirror before boarding the scaffold.',
+      requiredProof: 'Clear photo showing dorsal D-ring, leg buckle tension, and hard hat chin strap fastened.',
+    },
+  });
 
-  console.log('✅ Seeded Initial Machine Assets & Verified Audit History');
-  console.log('🎉 Seeding Complete!');
+  const assign2 = await prisma.assignment.create({
+    data: {
+      moduleId: modForkliftRecorded.id,
+      title: 'Forklift Fork Heel & Hydraulic Hose Inspection',
+      type: 'PHOTO_PROOF',
+      instructions: 'Inspect the forklift hydraulic fluid lines for leaks and measure fork heel thickness. Take a clear photo of the inspection tag.',
+      requiredProof: 'Photo of daily pre-shift inspection checklist signed on clipboard.',
+    },
+  });
+
+  // 5. Create Submissions
+  await prisma.assignmentSubmission.create({
+    data: {
+      assignmentId: assign1.id,
+      userId: worker1.id,
+      proofUrl: 'https://images.unsplash.com/photo-1541888946425-d0fbb186156f?w=600&auto=format&fit=crop&q=80',
+      notes: 'Harness inspected with Foreman David Miller. Double lanyard attached.',
+      status: 'APPROVED',
+      score: 100,
+      feedback: 'Excellent buckle tension and chin strap alignment.',
+      reviewedBy: supervisor.fullName,
+    },
+  });
+
+  await prisma.assignmentSubmission.create({
+    data: {
+      assignmentId: assign2.id,
+      userId: worker2.id,
+      proofUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80',
+      notes: 'Hydraulic hoses inspected. Tire pressure at 110 PSI.',
+      status: 'PENDING',
+      score: null,
+      feedback: null,
+      reviewedBy: null,
+    },
+  });
+
+  // 6. Create Visual Quizzes
+  await prisma.quiz.create({
+    data: {
+      moduleId: modHeightSafety.id,
+      type: 'SPOT_THE_HAZARD',
+      promptAudio: JSON.stringify({
+        en: 'Touch 3 hazards on the construction platform before climbing.',
+        hi: 'चढ़ने से पहले निर्माण मंच पर 3 खतरों को स्क्रीन पर स्पर्श करें।',
+      }),
+      questionData: JSON.stringify({
+        imageUrl: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&auto=format&fit=crop&q=80',
+        hazardTargets: [
+          { id: 'h1', name: 'Missing Toe Board Guardrail', xPercent: 24, yPercent: 42, radiusPercent: 12, explanation: 'Scaffolding requires an OSHA toe board to prevent falling tools.' },
+          { id: 'h2', name: 'Loose Electrical Power Cord', xPercent: 68, yPercent: 78, radiusPercent: 14, explanation: 'Trip hazard and electrocution risk near puddles.' },
+          { id: 'h3', name: 'Unlatched Safety Snap-Hook', xPercent: 48, yPercent: 28, radiusPercent: 10, explanation: 'Double-locking snap hook must be fully engaged.' },
+        ],
+      }),
+    },
+  });
+
+  // 7. Seed Attendance Records
+  const todayStr = new Date().toISOString().split('T')[0];
+  await prisma.attendance.create({
+    data: {
+      userId: worker1.id,
+      date: todayStr,
+      type: 'TOOLBOX_TALK',
+      status: 'PRESENT',
+      verifiedBy: supervisor.badgeId,
+    },
+  });
+
+  await prisma.attendance.create({
+    data: {
+      userId: worker2.id,
+      date: todayStr,
+      type: 'SHIFT_START',
+      status: 'PRESENT',
+      verifiedBy: supervisor.badgeId,
+    },
+  });
+
+  await prisma.attendance.create({
+    data: {
+      userId: worker3.id,
+      date: todayStr,
+      type: 'TOOLBOX_TALK',
+      status: 'PRESENT',
+      verifiedBy: supervisor.badgeId,
+    },
+  });
+
+  // 8. Seed Completions
+  await prisma.completion.create({
+    data: {
+      userId: worker1.id,
+      moduleId: modHeightSafety.id,
+      score: 100,
+      isPassed: true,
+      completedAt: new Date(),
+      isOfflineSynced: false,
+    },
+  });
+
+  await prisma.completion.create({
+    data: {
+      userId: worker3.id,
+      moduleId: modHeightSafety.id,
+      score: 95,
+      isPassed: true,
+      completedAt: new Date(),
+      isOfflineSynced: true,
+    },
+  });
+
+  // 9. Seed Machine Assets with QR Codes
+  await prisma.machineAsset.create({
+    data: {
+      qrCodeId: 'MACH-FORK-04',
+      name: 'Counterbalance Forklift Truck #04',
+      plantLocation: 'Logistics Bay 3',
+      linkedModuleId: modForkliftRecorded.id,
+    },
+  });
+
+  await prisma.machineAsset.create({
+    data: {
+      qrCodeId: 'MACH-CNC-12',
+      name: '5-Axis CNC Precision Machining Center #12',
+      plantLocation: 'Plant Alpha - Machine Shop',
+      linkedModuleId: modLotoLive.id,
+    },
+  });
+
+  console.log('🎉 Seeding Complete! LMS 360 database populated with 7 Sectors, Live Sessions, Quizzes, Assignments, and Attendance.');
 }
 
 main()
   .catch((e) => {
-    console.error('Seeding error:', e);
+    console.error(e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
   });
-

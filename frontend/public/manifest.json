@@ -1,7 +1,7 @@
 {
-  "name": "Frontline Safety & Skills LMS",
-  "short_name": "Frontline LMS",
-  "description": "Mobile-first vocational & safety microlearning for the frontline workforce",
+  "name": "LMS 360 - Frontline Safety & Skills",
+  "short_name": "LMS 360",
+  "description": "LMS 360: Mobile-first vocational & safety microlearning for the frontline workforce",
   "start_url": "/worker/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",

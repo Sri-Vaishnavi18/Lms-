@@ -8,24 +8,34 @@ generator client {
 }
 
 model User {
-  id                String           @id @default(uuid())
-  phoneNumber       String           @unique
-  badgeId           String           @unique
+  id                String                 @id @default(uuid())
+  phoneNumber       String                 @unique
+  badgeId           String                 @unique
   fullName          String
-  role              String           @default("WORKER") // WORKER, SUPERVISOR, ADMIN
-  preferredLanguage String           @default("en")
-  siteLocation      String           @default("Plant Alpha - Main Site")
-  department        String           @default("Operations")
+  role              String                 @default("WORKER") // WORKER, SUPERVISOR, ADMIN
+  status            String                 @default("ACTIVE") // ACTIVE, TERMINATED, SUSPENDED
+  password          String                 @default("1234")   // Plain/hash for demo/login
+  sector            String                 @default("CONSTRUCTION") // 7 sectors
+  trade             String                 @default("General Operations")
+  skillTier         String                 @default("UNSKILLED") // UNSKILLED, SEMI_SKILLED, SKILLED, HIGHLY_SKILLED
+  preferredLanguage String                 @default("en")
+  siteLocation      String                 @default("Plant Alpha - Main Site")
+  department        String                 @default("Operations")
   completions       Completion[]
-  supervisorAudits  PracticalAudit[] @relation("SupervisorAudits")
-  workerAudits      PracticalAudit[] @relation("WorkerAudits")
-  createdAt         DateTime         @default(now())
+  supervisorAudits  PracticalAudit[]       @relation("SupervisorAudits")
+  workerAudits      PracticalAudit[]       @relation("WorkerAudits")
+  submissions       AssignmentSubmission[]
+  attendances       Attendance[]
+  createdAt         DateTime               @default(now())
 }
 
 model Course {
   id          String   @id @default(uuid())
   title       String
   category    String   // EHS, MACHINE_SOP, QUALITY_5S, CONDUCT, DIGITAL_LITERACY
+  sector      String   @default("CONSTRUCTION")
+  skillTier   String   @default("UNSKILLED")
+  description String?
   modules     Module[]
   createdAt   DateTime @default(now())
 }
@@ -37,8 +47,15 @@ model Module {
   title           String
   durationSeconds Int
   videoUrl        String
+  sessionType     String       @default("RECORDED") // RECORDED, LIVE, HYBRID
+  liveSessionUrl  String?
+  liveStartTime   DateTime?
+  liveInstructor  String?
+  sector          String       @default("CONSTRUCTION")
+  skillTier       String       @default("UNSKILLED")
   audioTracks     String       // JSON-stringified: {"en": "/audio/en/...", "hi": "/audio/hi/..."}
   quizzes         Quiz[]
+  assignments     Assignment[]
   completions     Completion[]
   createdAt       DateTime     @default(now())
 }
@@ -51,6 +68,44 @@ model Quiz {
   promptAudio  String   // JSON-stringified: {"en": "...", "hi": "..."}
   questionData String   // JSON-stringified: { imageUrl, hazardTargets, swipeCards }
   createdAt    DateTime @default(now())
+}
+
+model Assignment {
+  id                 String                 @id @default(uuid())
+  moduleId           String
+  module             Module                 @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title              String
+  type               String                 @default("PHOTO_PROOF") // PHOTO_PROOF, SPOT_THE_HAZARD, PRACTICAL_CHECKLIST
+  instructions       String
+  requiredProof      String                 // e.g. "Upload photo wearing safety harness & helmet"
+  submissions        AssignmentSubmission[]
+  createdAt          DateTime               @default(now())
+}
+
+model AssignmentSubmission {
+  id           String     @id @default(uuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  proofUrl     String?
+  notes        String?
+  status       String     @default("PENDING") // PENDING, APPROVED, REJECTED
+  score        Int?
+  feedback     String?
+  reviewedBy   String?
+  submittedAt  DateTime   @default(now())
+}
+
+model Attendance {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       String   // YYYY-MM-DD
+  type       String   @default("TOOLBOX_TALK") // TOOLBOX_TALK, SHIFT_START, LIVE_SESSION, ON_JOB
+  status     String   @default("PRESENT")      // PRESENT, ABSENT, LATE
+  verifiedBy String?  // Supervisor or Admin badge
+  timestamp  DateTime @default(now())
 }
 
 model Completion {
@@ -86,4 +141,3 @@ model MachineAsset {
   linkedModuleId String
   createdAt      DateTime @default(now())
 }
-

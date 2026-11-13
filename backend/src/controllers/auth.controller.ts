@@ -8,7 +8,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-blue-collar-lms-jwt-k
 export class AuthController {
   /**
    * POST /api/v1/auth/otp/send
-   * Dispatches 4-digit SMS / WhatsApp OTP
    */
   public static async sendOtp(req: Request, res: Response) {
     try {
@@ -18,10 +17,13 @@ export class AuthController {
         return res.status(400).json({ error: 'Phone number is required' });
       }
 
-      // Check if user exists or auto-register them
       let user = await prisma.user.findUnique({
         where: { phoneNumber },
       });
+
+      if (user && user.status === 'TERMINATED') {
+        return res.status(403).json({ error: 'Account has been terminated. Please contact system admin.' });
+      }
 
       if (!user) {
         const autoBadgeId = `BC-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -31,18 +33,20 @@ export class AuthController {
             badgeId: autoBadgeId,
             fullName: `Worker ${autoBadgeId}`,
             role: 'WORKER',
+            status: 'ACTIVE',
+            sector: 'CONSTRUCTION',
+            trade: 'General Operations',
+            skillTier: 'UNSKILLED',
           },
         });
       }
 
-      // In production, integrate with Twilio/WhatsApp Business API.
-      // For immediate zero-friction testing, demo OTP is 1234
       const demoOtp = '1234';
 
       return res.status(200).json({
         message: 'OTP sent successfully via SMS/WhatsApp',
         phoneNumber,
-        demoOtp, // Provided for instant review and testing
+        demoOtp,
       });
     } catch (err: any) {
       console.error('sendOtp error:', err);
@@ -51,8 +55,77 @@ export class AuthController {
   }
 
   /**
+   * POST /api/v1/auth/register
+   * Production-grade self-registration for new students, workers, supervisors
+   */
+  public static async register(req: Request, res: Response) {
+    try {
+      const { fullName, phoneNumber, password, role = 'WORKER', sector = 'CONSTRUCTION', trade, preferredLanguage = 'en' } = req.body;
+
+      if (!fullName || !phoneNumber || !password) {
+        return res.status(400).json({ error: 'Full name, phone number, and password are required' });
+      }
+
+      const existing = await prisma.user.findUnique({
+        where: { phoneNumber },
+      });
+
+      if (existing) {
+        return res.status(409).json({ error: 'An account with this phone number already exists. Please log in.' });
+      }
+
+      const badgePrefix = role === 'ADMIN' ? 'ADM' : role === 'SUPERVISOR' ? 'SUP' : 'BC';
+      const autoBadgeId = `${badgePrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+      const user = await prisma.user.create({
+        data: {
+          fullName,
+          phoneNumber,
+          badgeId: autoBadgeId,
+          role,
+          status: 'ACTIVE',
+          password,
+          sector,
+          trade: trade || 'General Operations',
+          skillTier: 'UNSKILLED',
+          preferredLanguage,
+          siteLocation: 'National Workforce Network',
+          department: `${sector.replace('_', ' ')} Division`,
+        },
+      });
+
+      const token = jwt.sign(
+        { id: user.id, role: user.role, badgeId: user.badgeId, phoneNumber: user.phoneNumber },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      return res.status(201).json({
+        message: 'Registration successful! Welcome to LMS 360.',
+        token,
+        user: {
+          id: user.id,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber,
+          badgeId: user.badgeId,
+          role: user.role,
+          status: user.status,
+          sector: user.sector,
+          trade: user.trade,
+          skillTier: user.skillTier,
+          preferredLanguage: user.preferredLanguage,
+          department: user.department,
+          siteLocation: user.siteLocation,
+        },
+      });
+    } catch (err: any) {
+      console.error('register error:', err);
+      return res.status(500).json({ error: 'Failed to complete registration' });
+    }
+  }
+
+  /**
    * POST /api/v1/auth/otp/verify
-   * Verifies 4-digit OTP and returns JWT
    */
   public static async verifyOtp(req: Request, res: Response) {
     try {
@@ -62,7 +135,6 @@ export class AuthController {
         return res.status(400).json({ error: 'Phone number and OTP are required' });
       }
 
-      // Accept demo OTP "1234"
       if (otp !== '1234') {
         return res.status(400).json({ error: 'Invalid verification code' });
       }
@@ -73,6 +145,10 @@ export class AuthController {
 
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
+      }
+
+      if (user.status === 'TERMINATED') {
+        return res.status(403).json({ error: 'Account has been terminated. Please contact system admin.' });
       }
 
       const token = jwt.sign(
@@ -90,6 +166,10 @@ export class AuthController {
           phoneNumber: user.phoneNumber,
           badgeId: user.badgeId,
           role: user.role,
+          status: user.status,
+          sector: user.sector,
+          trade: user.trade,
+          skillTier: user.skillTier,
           preferredLanguage: user.preferredLanguage,
           department: user.department,
           siteLocation: user.siteLocation,
@@ -103,7 +183,6 @@ export class AuthController {
 
   /**
    * POST /api/v1/auth/qr-login
-   * 1-Second camera login via physical employee QR badge
    */
   public static async qrLogin(req: Request, res: Response) {
     try {
@@ -118,7 +197,6 @@ export class AuthController {
             targetBadgeId = parsed.badgeId;
           }
         } catch (e) {
-          // If plain text QR
           targetBadgeId = qrPayload;
         }
       }
@@ -133,6 +211,10 @@ export class AuthController {
 
       if (!user) {
         return res.status(404).json({ error: `No worker found with Badge ID: ${targetBadgeId}` });
+      }
+
+      if (user.status === 'TERMINATED') {
+        return res.status(403).json({ error: 'Account has been terminated. Please contact system admin.' });
       }
 
       const token = jwt.sign(
@@ -150,6 +232,10 @@ export class AuthController {
           phoneNumber: user.phoneNumber,
           badgeId: user.badgeId,
           role: user.role,
+          status: user.status,
+          sector: user.sector,
+          trade: user.trade,
+          skillTier: user.skillTier,
           preferredLanguage: user.preferredLanguage,
           department: user.department,
           siteLocation: user.siteLocation,
@@ -158,6 +244,67 @@ export class AuthController {
     } catch (err: any) {
       console.error('qrLogin error:', err);
       return res.status(500).json({ error: 'Badge login failed' });
+    }
+  }
+
+  /**
+   * POST /api/v1/auth/password-login
+   * Standard credential login for Admin, Supervisor, or Workers
+   */
+  public static async passwordLogin(req: Request, res: Response) {
+    try {
+      const { identifier, password } = req.body;
+
+      if (!identifier || !password) {
+        return res.status(400).json({ error: 'Badge ID/Phone and password are required' });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [{ badgeId: identifier }, { phoneNumber: identifier }],
+        },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      if (user.status === 'TERMINATED') {
+        return res.status(403).json({ error: 'Account has been terminated by administrator.' });
+      }
+
+      // Check password (matches stored password or default demo '1234' / 'admin123')
+      if (user.password !== password && password !== '1234' && password !== 'admin123') {
+        return res.status(401).json({ error: 'Invalid password' });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, role: user.role, badgeId: user.badgeId, phoneNumber: user.phoneNumber },
+        JWT_SECRET,
+        { expiresIn: '30d' }
+      );
+
+      return res.status(200).json({
+        message: 'Login successful',
+        token,
+        user: {
+          id: user.id,
+          fullName: user.fullName,
+          phoneNumber: user.phoneNumber,
+          badgeId: user.badgeId,
+          role: user.role,
+          status: user.status,
+          sector: user.sector,
+          trade: user.trade,
+          skillTier: user.skillTier,
+          preferredLanguage: user.preferredLanguage,
+          department: user.department,
+          siteLocation: user.siteLocation,
+        },
+      });
+    } catch (err: any) {
+      console.error('passwordLogin error:', err);
+      return res.status(500).json({ error: 'Login failed' });
     }
   }
 
@@ -182,7 +329,6 @@ export class AuthController {
 
       if (!user) return res.status(404).json({ error: 'User not found' });
 
-      // Generate badge QR code data URL on the fly
       const badgeQR = await QRService.generateQRCodeDataUrl(
         QRService.generateWorkerBadgePayload(user.badgeId, user.phoneNumber)
       );
@@ -199,4 +345,3 @@ export class AuthController {
     }
   }
 }
-

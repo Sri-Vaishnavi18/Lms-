@@ -21,7 +21,7 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'ONLINE',
-    service: 'Blue-Collar LMS Backend API',
+    service: 'LMS 360 Backend API',
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
   });
@@ -42,7 +42,7 @@ app.use((req, res) => {
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
-    console.log(`🚀 Blue-Collar LMS Backend running at http://localhost:${PORT}`);
+    console.log(`🚀 LMS 360 Backend running at http://localhost:${PORT}`);
   });
 }
 

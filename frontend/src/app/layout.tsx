@@ -2,17 +2,17 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Frontline LMS - Blue-Collar Safety & Skills',
-  description: 'Mobile-first vocational & safety microlearning for the frontline workforce',
+  title: 'LMS 360 - Enterprise Vocational & Frontline LMS Platform',
+  description:
+    'LMS 360: Enterprise vocational training, live masterclasses, and safety microlearning for frontline and technical workforce across 7 sectors and 11 Indian languages.',
   manifest: '/manifest.json',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: '#1e3a8a',
+  maximumScale: 5,
+  themeColor: '#2563eb',
 };
 
 export default function RootLayout({
@@ -22,10 +22,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-slate-100 text-slate-800 antialiased min-h-screen">
+      <body className="bg-slate-50 text-slate-900 antialiased min-h-screen">
         {children}
       </body>
     </html>
   );
 }
-

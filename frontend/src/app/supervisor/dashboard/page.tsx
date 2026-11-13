@@ -2,7 +2,22 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Tablet, Users, CheckCircle2, AlertCircle, PlaySquare, PenTool, ShieldCheck, RefreshCw } from 'lucide-react';
+import {
+  Tablet,
+  Users,
+  CheckCircle2,
+  AlertCircle,
+  PlaySquare,
+  PenTool,
+  ShieldCheck,
+  RefreshCw,
+  Clock,
+  ArrowRight,
+  ChevronRight,
+  HardHat,
+} from 'lucide-react';
+import { Navbar } from '../../../components/Navbar';
+import { Footer } from '../../../components/Footer';
 import { fetchApi } from '../../../lib/api';
 
 export default function SupervisorDashboardPage() {
@@ -22,87 +37,99 @@ export default function SupervisorDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Top Header */}
-        <header className="bg-emerald-900 text-white rounded-3xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-700/80 text-white flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50 flex flex-col text-slate-800">
+      <Navbar />
+
+      {/* Top Header */}
+      <div className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-black border border-emerald-200">
               <Tablet className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-xs uppercase font-black text-emerald-300 tracking-wider">
-                Shift Supervisor Tablet Portal
-              </span>
-              <h1 className="text-2xl font-black">Morning Shift Operations</h1>
-              <p className="text-xs text-emerald-200">Plant Alpha • Shift Lead: David Miller</p>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-black text-emerald-700 tracking-wider bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  Supervisor Operations Portal
+                </span>
+                <span className="text-xs text-slate-400">• Plant Alpha Shift #1</span>
+              </div>
+              <h1 className="text-2xl font-black text-slate-900 mt-1">Shift Crew Roster & Practical Verification</h1>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/supervisor/toolbox"
-              className="py-3 px-5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl text-xs flex items-center gap-2 shadow-md"
+              className="py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-xl text-xs flex items-center gap-2 shadow-xs transition-colors"
             >
-              <PlaySquare className="w-4 h-4 fill-slate-950 text-amber-400" />
-              <span>Start Toolbox Talk (Group Mode)</span>
+              <PlaySquare className="w-4 h-4" />
+              <span>Conduct Morning Toolbox Talk</span>
             </Link>
 
             <Link
               href="/supervisor/practical"
-              className="py-3 px-5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-xs border border-white/20 flex items-center gap-2"
+              className="py-2.5 px-4 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs border border-slate-300 flex items-center gap-2 shadow-xs transition-colors"
             >
-              <PenTool className="w-4 h-4" />
-              <span>Practical Audit</span>
+              <PenTool className="w-4 h-4 text-slate-600" />
+              <span>Practical Field Sign-off</span>
             </Link>
           </div>
-        </header>
+        </div>
+      </div>
 
-        {/* Shift Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+      {/* Main Container */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-xs font-bold text-slate-400 uppercase">Active Crew on Shift</span>
-              <div className="text-3xl font-black text-slate-900 mt-1">{crewData?.totalCrew ?? 3} Workers</div>
+              <span className="text-[11px] font-bold text-slate-500 uppercase">Active Crew on Shift</span>
+              <div className="text-3xl font-black text-slate-900 mt-1">{crewData?.totalCrew ?? 9} Workers</div>
+              <span className="text-[10px] text-slate-400 mt-0.5 block">Logged on Site</span>
             </div>
-            <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-700">
+            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
               <Users className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-emerald-200 bg-emerald-50/20 shadow-sm flex items-center justify-between">
+          <div className="bg-white p-5 rounded-3xl border border-emerald-200/80 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-xs font-bold text-emerald-700 uppercase">Shift Safety Certified</span>
-              <div className="text-3xl font-black text-emerald-900 mt-1">
-                {crewData?.certifiedCrew ?? 1} Workers
+              <span className="text-[11px] font-bold text-emerald-700 uppercase">Shift Safety Certified</span>
+              <div className="text-3xl font-black text-emerald-800 mt-1">
+                {crewData?.certifiedCrew ?? 7} Workers
               </div>
+              <span className="text-[10px] text-emerald-600 font-bold mt-0.5 block">Ready for Hazardous Machinery</span>
             </div>
-            <div className="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-white p-5 rounded-2xl border border-amber-200 bg-amber-50/20 shadow-sm flex items-center justify-between">
+          <div className="bg-white p-5 rounded-3xl border border-amber-200/80 shadow-xs flex items-center justify-between">
             <div>
-              <span className="text-xs font-bold text-amber-700 uppercase">Refresher Training Pending</span>
+              <span className="text-[11px] font-bold text-amber-700 uppercase">Training / Practical Pending</span>
               <div className="text-3xl font-black text-amber-900 mt-1">{crewData?.pendingCrew ?? 2} Workers</div>
+              <span className="text-[10px] text-amber-600 font-bold mt-0.5 block">Requires 2-min SOP Refresher</span>
             </div>
-            <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
               <AlertCircle className="w-6 h-6" />
             </div>
           </div>
         </div>
 
         {/* Crew Roster Table */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <div className="p-6 border-b border-slate-100 flex flex-wrap justify-between items-center gap-3">
             <div>
-              <h2 className="text-base font-black text-slate-900">Shift Roster & Safety Status</h2>
-              <p className="text-xs text-slate-500">Live synchronization with worker mobile completions</p>
+              <h2 className="text-base font-black text-slate-900">Shift Roster & Real-Time Clearance Status</h2>
+              <p className="text-xs text-slate-500">
+                Direct verification against mobile video bites, spot-the-hazard exam results, and attendance records
+              </p>
             </div>
             <button
               onClick={loadCrew}
-              className="p-2 text-slate-500 hover:text-slate-800 rounded-lg border border-slate-200 text-xs font-bold flex items-center gap-1.5"
+              className="px-3.5 py-2 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition-colors"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh Roster</span>
@@ -112,10 +139,11 @@ export default function SupervisorDashboardPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <tr className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                   <th className="p-4">Worker Name</th>
                   <th className="p-4">Badge ID</th>
-                  <th className="p-4">Department</th>
+                  <th className="p-4">Sector / Trade</th>
+                  <th className="p-4">Skill Tier</th>
                   <th className="p-4">Safety Modules</th>
                   <th className="p-4">Practical Check-Off</th>
                   <th className="p-4">Shift Clearance</th>
@@ -123,10 +151,18 @@ export default function SupervisorDashboardPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {crewData?.roster?.map((w: any) => (
-                  <tr key={w.id} className="hover:bg-slate-50/60 transition-colors">
+                  <tr key={w.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="p-4 font-bold text-slate-900">{w.fullName}</td>
                     <td className="p-4 font-mono text-slate-600">{w.badgeId}</td>
-                    <td className="p-4 text-slate-600">{w.department}</td>
+                    <td className="p-4 text-slate-600">
+                      <span className="font-bold text-slate-800">{w.sector?.replace(/_/g, ' ') || w.department}</span>
+                      {w.trade && <span className="text-[10px] text-slate-400 block">{w.trade}</span>}
+                    </td>
+                    <td className="p-4">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-100 text-slate-700 border border-slate-200">
+                        {w.skillTier || 'SEMI_SKILLED'}
+                      </span>
+                    </td>
                     <td className="p-4">
                       <span className="font-bold text-slate-800">
                         {w.passedModulesCount} / {w.totalModulesCount || 5}
@@ -138,7 +174,7 @@ export default function SupervisorDashboardPage() {
                           <CheckCircle2 className="w-3 h-3" /> Verified
                         </span>
                       ) : (
-                        <span className="text-slate-400 font-medium">Pending Observation</span>
+                        <span className="text-slate-400 font-medium">Pending Sign-off</span>
                       )}
                     </td>
                     <td className="p-4">
@@ -158,7 +194,9 @@ export default function SupervisorDashboardPage() {
             </table>
           </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
