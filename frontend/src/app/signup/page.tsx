@@ -59,7 +59,11 @@ export default function SignUpPage() {
         router.push('/worker/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please verify your details.');
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('Network request failed')) {
+        setError('Cannot connect to LMS backend server (http://localhost:5000). Please make sure backend is running.');
+      } else {
+        setError(err.message || 'Registration failed. Please verify your details.');
+      }
     } finally {
       setLoading(false);
     }
@@ -83,9 +87,22 @@ export default function SignUpPage() {
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-xl px-4 sm:px-0">
         <div className="bg-white py-8 px-6 sm:px-10 shadow-xl border border-slate-200 rounded-3xl">
           {error && (
-            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-              <span>{error}</span>
+            <div className="mb-5 p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl flex flex-col gap-2">
+              <div className="flex items-center gap-2 font-bold">
+                <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                <span>{error}</span>
+              </div>
+              {error.toLowerCase().includes('already exists') && (
+                <div className="mt-1 pt-2 border-t border-red-200/60 flex items-center justify-between">
+                  <span className="text-slate-600">Your profile is already active in LMS 360.</span>
+                  <Link
+                    href={`/login`}
+                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition-colors"
+                  >
+                    Go to Sign In →
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 

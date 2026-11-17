@@ -42,7 +42,33 @@ The SQLite database (`backend/prisma/dev.db`) is already seeded with realistic f
 
 ---
 
-## 📱 Front-End Screens (Worker Mobile PWA)
+## 📱 Key Front-End Experiences & Engines
+
+### ⚡ 1. YouTube Shorts Vertical Microlearning Engine (`/shorts` or `/worker/shorts`)
+* **9:16 Fullscreen Vertical Snap-Scroll Feed:** Swipe up/down (or arrow keys) through bite-sized 45–60s video demonstrations.
+* **11 Native Indian Languages Switcher:** Instant audio track switching (Hindi, Telugu, Tamil, Kannada, Marathi, Bengali, Gujarati, Malayalam, Odia, Punjabi, English) with speech synthesis and voiceover equalizer.
+* **Interactive Floating Action Bar:**
+  * **❤️ Like Button:** Social proof with live counter and animated heart burst.
+  * **🎯 30-Sec Instant Quiz:** Pop-up micro-check right over the video with a 30s countdown clock, instant visual feedback, and +50 XP skill reward.
+  * **💬 Ask Shift Foreman:** Voice note recorder for low-literacy workers with mother-tongue audio questions.
+  * **📥 Offline Save:** 1-tap download into device IndexedDB for no-connectivity basement/site zones.
+  * **🔄 Machine QR Share:** Shop-floor quick launch QR code.
+* **Split-Screen Badging:** Interactive **Wrong Way ❌ vs. Right Way ✔️** visual alerts.
+
+### 📚 2. Udemy & Coursera Standard Course Catalog & Player (`/courses` & `/courses/:id`)
+* **Standardized 7-Sector Navigation:** Construction, Skilled Technical, Manufacturing, Logistics, Agriculture, Cleaning, Hospitality.
+* **4-Skill Tier Progression:** Tier 1 (Unskilled), Tier 2 (Semi-Skilled), Tier 3 (Skilled), Tier 4 (Highly-Skilled).
+* **Udemy-Style Course Cards:** Star ratings, reviews, enrolled worker counts, duration badges, and **Wage Incentive Milestones** (e.g. *"Tier 2 Unlock: +₹1,500/mo allowance"*).
+* **Coursera-Style Course Player & Syllabus Drawer:** Collapsible lesson drawer, video scrubber, interactive tabs (Overview, Practical Assignment, Quiz, Skill Passport, Q&A).
+
+### 📸 3. Practical Field Assignments Engine
+* **Photo Proof Upload:** Frontline operators upload camera photos of their executed work (safety harness, LOTO padlock, machine setup).
+* **Mother-Tongue Voice Notes:** Low-literacy workers record audio explanations rather than typing text.
+* **Supervisor Review Queue:** Shift foremen review photo and voice evidence and sign off with their digital signature.
+
+---
+
+## 📱 Worker Mobile PWA Screens
 
 * **Worker Login (`/worker/login`):** Zero-email login via Phone OTP or 1-second Camera Badge Scan (`BC-1001`).
 * **Worker Home (`/worker/dashboard`):** Features "Today's Required Safety Bite" (2-minute video), floating "Tap to Listen" audio narration, and quick actions.

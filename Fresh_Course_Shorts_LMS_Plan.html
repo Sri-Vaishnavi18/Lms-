@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fresh LMS Blueprint: Blue-Collar Courses + Related Shorts & Quizzes</title>
+  <style>
+    :root {
+      --primary: #0056D2;
+      --secondary: #A435F0;
+      --dark: #0F172A;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --amber: #F59E0B;
+      --emerald: #10B981;
+      --rose: #EF4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: #F8FAFC; color: var(--text); line-height: 1.6; padding-bottom: 80px; }
+
+    /* Top Sticky Print / Save Bar */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .top-bar h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .print-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .print-btn:hover { background: #00419e; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 50%, #0F172A 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 44px;
+      margin-bottom: 36px;
+      box-shadow: 0 20px 40px -15px rgba(0, 86, 210, 0.25);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+    .hero h1 { font-size: 34px; font-weight: 900; line-height: 1.2; margin-bottom: 10px; }
+    .hero p { font-size: 15px; color: #CBD5E1; max-width: 820px; }
+
+    /* Course Hub Architecture Box */
+    .hub-box {
+      background: #020617;
+      border: 2px solid #1E293B;
+      border-radius: 24px;
+      padding: 32px;
+      color: white;
+      margin: 28px 0 40px 0;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    .hub-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #1E293B; }
+    .hub-title { font-size: 18px; font-weight: 800; color: #60A5FA; display: flex; align-items: center; gap: 8px; }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .hub-column {
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .hub-col-icon { font-size: 28px; margin-bottom: 10px; }
+    .hub-col-title { font-size: 14px; font-weight: 800; margin-bottom: 6px; color: #F1F5F9; }
+    .hub-col-desc { font-size: 12px; color: #94A3B8; line-height: 1.5; margin-bottom: 12px; }
+    .hub-tag { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+    .tag-blue { background: rgba(59, 130, 246, 0.2); color: #93C5FD; }
+    .tag-rose { background: rgba(244, 63, 94, 0.2); color: #FDA4AF; }
+    .tag-amber { background: rgba(245, 158, 11, 0.2); color: #FDE68A; }
+    .tag-green { background: rgba(16, 185, 129, 0.2); color: #A7F3D0; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+    th, td { padding: 14px 18px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+    th { background: #F1F5F9; font-weight: 800; color: #334155; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Sectors Grid */
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .sector-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .sector-icon { font-size: 26px; padding: 10px; background: #F8FAFC; border-radius: 12px; border: 1px solid var(--border); }
+
+    @media print {
+      .top-bar { display: none; }
+      body { background: white; color: black; padding: 0; }
+      .hero { box-shadow: none; border: 1px solid #ccc; color: black; background: #f0f4f8; }
+      .hero p { color: #333; }
+      .hub-box { background: white; color: black; border: 1px solid #ccc; box-shadow: none; }
+      .hub-column { background: #f8fafc; border: 1px solid #ccc; color: black; }
+      .hub-col-desc { color: #555; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Action Bar -->
+  <div class="top-bar">
+    <h2>
+      <span>📘</span>
+      <span>Blue-Collar LMS Blueprint: Courses + Related Shorts & Quizzes</span>
+    </h2>
+    <button class="print-btn" onclick="window.print()">
+      <span>🖨️</span>
+      <span>Print / Save as PDF</span>
+    </button>
+  </div>
+
+  <div class="container">
+
+    <!-- Hero Header -->
+    <div class="hero">
+      <div class="badge">Unified Blue-Collar Architecture Plan</div>
+      <h1>Courses + Related Shorts + Related Quizzes</h1>
+      <p>
+        A fresh, ground-up rebuild designed specifically for India's 7 frontline sectors. Every single course owns its own vertical 9:16 YouTube Shorts feed, its related interactive quizzes, practical field photo proofs, and certified wage increment milestones.
+      </p>
+    </div>
+
+    <!-- The Course Hub Visual Core -->
+    <div class="hub-box">
+      <div class="hub-header">
+        <div class="hub-title">
+          <span>🎯</span>
+          <span>The Course Hub Model (/courses/[id])</span>
+        </div>
+        <span style="font-size: 11px; font-mono; color: #94A3B8;">ALL 4 COMPONENTS INTRINSICALLY LINKED</span>
+      </div>
+
+      <div class="hub-grid">
+        <!-- Col 1: Lessons -->
+        <div class="hub-column">
+          <div>
+            <div class="hub-col-icon">📚</div>
+            <div class="hub-col-title">1. Course Lessons & SOPs</div>
+            <p class="hub-col-desc">
+              HD 16:9 lectures with custom scrubber, 11-language audio voiceover, and sticky collapsible syllabus drawer showing chapter checkmarks.
+            </p>
+          </div>
+          <span class="hub-tag tag-blue">Coursera & Udemy Player</span>
+        </div>
+
+        <!-- Col 2: Related Shorts -->
+        <div class="hub-column">
+          <div>
+            <div class="hub-col-icon">⚡</div>
+            <div class="hub-col-title">2. Course Related Shorts</div>
+            <p class="hub-col-desc">
+              Dedicated vertical 9:16 Reels for THIS course! Swipe through 45-60s demonstrations with Thumbs Up/Down and Wrong ❌ vs Right ✔️ badges.
+            </p>
+          </div>
+          <span class="hub-tag tag-rose">YouTube Shorts Reel</span>
+        </div>
+
+        <!-- Col 3: Quizzes -->
+        <div class="hub-column">
+          <div>
+            <div class="hub-col-icon">🎯</div>
+            <div class="hub-col-title">3. Related Quizzes</div>
+            <p class="hub-col-desc">
+              Interactive Spot-the-Hazard image touch canvases and 30-sec time trials tied directly to this course's specific machinery and protocols.
+            </p>
+          </div>
+          <span class="hub-tag tag-amber">Interactive Micro-Check</span>
+        </div>
+
+        <!-- Col 4: Photo Proof -->
+        <div class="hub-column">
+          <div>
+            <div class="hub-col-icon">📸</div>
+            <div class="hub-col-title">4. Practical Proof & Wage</div>
+            <p class="hub-col-desc">
+              Workers take a camera photo of safety harness / LOTO lock + record a mother-tongue voice note. Shift supervisor signs off with digital signature.
+            </p>
+          </div>
+          <span class="hub-tag tag-green">+₹1,500/mo Wage Unlock</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: 7 Sectors -->
+    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">1. Dedicated Curriculum for India's 7 Blue-Collar Sectors</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+      Every course, short, and quiz is categorized by frontline trade.
+    </p>
+
+    <div class="sectors-grid">
+      <div class="sector-item">
+        <div class="sector-icon">🏗️</div>
+        <div>
+          <strong style="font-size: 14px;">1. Construction</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Masons, painters, welders, tile workers, concrete workers & helpers.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">⚡</div>
+        <div>
+          <strong style="font-size: 14px;">2. Skilled Technical</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Electricians, plumbers, carpenters, mechanics & HVAC technicians.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🏭</div>
+        <div>
+          <strong style="font-size: 14px;">3. Manufacturing & Factory</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Machine operators, assembly-line, production crew & quality inspectors.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🚚</div>
+        <div>
+          <strong style="font-size: 14px;">4. Transportation & Logistics</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Truck drivers, delivery agents, forklift pilots, warehouse staff & loaders.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🌾</div>
+        <div>
+          <strong style="font-size: 14px;">5. Agricultural & Allied</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Farmers, farm labourers, harvesters, dairy staff & plantation crews.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🧹</div>
+        <div>
+          <strong style="font-size: 14px;">6. Cleaning & Maintenance</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Housekeeping, cleaners, sanitation crew, gardeners & facility staff.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🍳</div>
+        <div>
+          <strong style="font-size: 14px;">7. Hospitality & Service</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Cooks, kitchen assistants, hotel housekeeping, laundry & catering.</p>
+        </div>
+      </div>
+    </div>
+
+    <br /><br />
+
+    <!-- Section 3: Skill Tiers & Wage Differential -->
+    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">2. Skill Tiers & Verified Wage Milestones</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+      Giving blue-collar workers tangible reasons to learn and master their trade.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Skill Tier</th>
+          <th>What They Learn</th>
+          <th>Assessment Method</th>
+          <th>Certified Wage Benefit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tier 1: Unskilled (Bronze)</strong></td>
+          <td>Site induction, 100% PPE adherence, zero energy awareness</td>
+          <td>Spot-the-Hazard Touch Quiz</td>
+          <td>Site Gate Clearance Pass</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 2: Semi-Skilled (Silver)</strong></td>
+          <td>Equipment pre-shift SOPs, forklift reverse check, machine guards</td>
+          <td>Course Quiz + 1 Photo Proof</td>
+          <td><strong>+₹1,200 to ₹1,500/month</strong> machine allowance</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 3: Skilled (Gold)</strong></td>
+          <td>Lockout-Tagout (LOTO), arc flash PPE, complex machinery operations</td>
+          <td>Photo Proof + Voice Note</td>
+          <td><strong>+₹2,000 to ₹2,500/month</strong> autonomous operator pay</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 4: Highly-Skilled (Master)</strong></td>
+          <td>Toolbox talk coaching, substation diagnostics, emergency response</td>
+          <td>Supervisor Digital Signature</td>
+          <td><strong>+₹3,200/month</strong> Shift Lead inspector pay</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br /><br />
+
+    <!-- Section 4: 11 Indian Native Languages -->
+    <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">3. Native Vernacular Language & Zero-Literacy Audio</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+      Eliminating text barriers completely across all 11 languages.
+    </p>
+
+    <div style="display: flex; flex-wrap: gap; gap: 10px; margin-top: 10px;">
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇬🇧 English</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 हिंदी (Hindi)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 தமிழ் (Tamil)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 తెలుగు (Telugu)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 ಕನ್ನಡ (Kannada)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 मराठी (Marathi)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 বাংলা (Bengali)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 ગુજરાતી (Gujarati)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 മലയാളം (Malayalam)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</span>
+      <span style="background: white; border: 1px solid var(--border); padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;">🇮🇳 ଓଡ଼ିଆ (Odia)</span>
+    </div>
+
+  </div>
+
+</body>
+</html>

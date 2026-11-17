@@ -19,8 +19,9 @@ import {
   Menu,
   X,
   FileCheck,
+  Zap,
 } from 'lucide-react';
-import { INDIAN_LANGUAGES } from '../lib/languages';
+import { INDIAN_LANGUAGES, SECTORS_LIST, SKILL_TIERS } from '../lib/languages';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -29,6 +30,8 @@ export const Navbar: React.FC = () => {
   const [language, setLanguage] = useState<string>('en');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [exploreDropdownOpen, setExploreDropdownOpen] = useState(false);
+  const [navSearch, setNavSearch] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -90,17 +93,101 @@ export const Navbar: React.FC = () => {
                 </span>
               </div>
             </Link>
+
+            {/* Coursera-Style Explore Mega-Dropdown */}
+            <div className="relative hidden lg:block">
+              <button
+                type="button"
+                onClick={() => setExploreDropdownOpen(!exploreDropdownOpen)}
+                className="px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold text-xs flex items-center gap-1.5 transition-colors border border-blue-200"
+              >
+                <Layers className="w-4 h-4 text-blue-600" />
+                <span>Explore</span>
+                <ChevronDown className="w-3.5 h-3.5 text-blue-600" />
+              </button>
+
+              {exploreDropdownOpen && (
+                <div className="absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 animate-scale-in text-xs space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <span className="font-black text-slate-900 uppercase text-[10px] tracking-wider">
+                      7 Frontline Sectors
+                    </span>
+                    <Link
+                      href="/courses"
+                      onClick={() => setExploreDropdownOpen(false)}
+                      className="text-blue-600 font-bold text-[10px] hover:underline"
+                    >
+                      View All →
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-1">
+                    {SECTORS_LIST.map((s) => (
+                      <Link
+                        key={s.id}
+                        href={`/courses?sector=${s.id}`}
+                        onClick={() => setExploreDropdownOpen(false)}
+                        className="p-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 hover:text-blue-700 font-medium transition-colors"
+                      >
+                        <span className="text-base">{s.icon}</span>
+                        <span>{s.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 space-y-1">
+                    <span className="font-black text-slate-900 uppercase text-[10px] tracking-wider block mb-1">
+                      Quick Access
+                    </span>
+                    <Link
+                      href="/shorts"
+                      onClick={() => setExploreDropdownOpen(false)}
+                      className="p-2 rounded-xl bg-gradient-to-r from-rose-50 to-amber-50 border border-amber-200 flex items-center gap-2 text-slate-900 font-bold"
+                    >
+                      <Zap className="w-4 h-4 text-rose-600 fill-rose-600" />
+                      <span>YouTube Shorts 9:16 Video Feed</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Udemy/Coursera Universal Search Bar */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (navSearch.trim()) router.push(`/courses?search=${encodeURIComponent(navSearch)}`);
+              }}
+              className="hidden xl:flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-full px-3 py-1.5 w-64 focus-within:w-80 focus-within:bg-white focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all text-xs"
+            >
+              <Search className="w-4 h-4 text-slate-400 shrink-0" />
+              <input
+                type="text"
+                placeholder="What do you want to learn?..."
+                value={navSearch}
+                onChange={(e) => setNavSearch(e.target.value)}
+                className="bg-transparent text-slate-800 placeholder-slate-400 focus:outline-none w-full text-xs font-medium"
+              />
+            </form>
           </div>
 
           {/* Center Navigation Links (Udemy / iGOT style) */}
           <nav className="hidden md:flex items-center gap-1 text-xs font-bold text-slate-600">
             <Link
-              href="/"
-              className={`px-3 py-2 rounded-lg transition-colors ${
-                pathname === '/' ? 'text-blue-700 bg-blue-50' : 'hover:text-slate-900 hover:bg-slate-50'
+              href="/courses"
+              className={`px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 ${
+                pathname.startsWith('/courses') ? 'text-blue-700 bg-blue-50' : 'hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              Explore Catalog
+              <span>Courses (Udemy)</span>
+            </Link>
+
+            <Link
+              href="/shorts"
+              className="px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-600 to-amber-500 hover:from-rose-500 hover:to-amber-400 text-white font-black flex items-center gap-1 shadow-sm transition-all active:scale-95 ml-1 mr-1"
+            >
+              <Zap className="w-3.5 h-3.5 fill-white" />
+              <span>Shorts (Reels)</span>
             </Link>
 
             <Link
@@ -282,11 +369,18 @@ export const Navbar: React.FC = () => {
         {mobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-slate-200 space-y-2 text-xs font-bold text-slate-700">
             <Link
-              href="/"
+              href="/courses"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-slate-100"
+              className="block px-3 py-2 rounded-lg hover:bg-slate-100 text-blue-700"
             >
-              Explore Catalog
+              Courses (Udemy Catalog)
+            </Link>
+            <Link
+              href="/shorts"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-lg bg-gradient-to-r from-rose-600 to-amber-500 text-white font-black"
+            >
+              ⚡ YouTube Shorts (Reels)
             </Link>
             <Link
               href="/worker/dashboard"

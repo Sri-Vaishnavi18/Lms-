@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LMS Master Implementation Blueprint: Udemy & Coursera UI + YouTube Shorts Engine</title>
+  <style>
+    :root {
+      --coursera-blue: #0056D2;
+      --coursera-dark: #1F1F1F;
+      --udemy-purple: #A435F0;
+      --udemy-dark: #1C1D1F;
+      --yt-red: #FF0000;
+      --yt-dark: #0F0F0F;
+      --amber: #F59E0B;
+      --emerald: #10B981;
+      --crimson: #EF4444;
+      --bg: #F8FAFC;
+      --card: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 80px; }
+
+    /* Top Floating Print & Download Header */
+    .top-actions {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      color: white;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .top-actions h2 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .print-btn {
+      background: var(--coursera-blue);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .print-btn:hover { background: #00419e; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #0056D2 0%, #1C1D1F 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 48px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 40px -15px rgba(0, 86, 210, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+    .hero h1 { font-size: 36px; font-weight: 900; line-height: 1.2; margin-bottom: 12px; }
+    .hero p { font-size: 16px; color: #E2E8F0; max-width: 800px; line-height: 1.6; }
+
+    /* Comparison Grid */
+    .section-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+    .section-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+    .grid-2 { display: grid; grid-cols: 1fr; gap: 24px; margin-bottom: 40px; }
+    @media(min-width: 860px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      padding: 28px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .card-title { font-size: 18px; font-weight: 800; }
+
+    /* Visual Mockups */
+    .mockup-container {
+      background: #0F172A;
+      border-radius: 20px;
+      padding: 24px;
+      color: white;
+      margin: 24px 0 40px 0;
+      border: 1px solid #334155;
+    }
+    .mockup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .mockup-title { font-size: 16px; font-weight: 800; color: #93C5FD; display: flex; align-items: center; gap: 8px; }
+
+    /* YouTube Shorts Phone Frame Mockup */
+    .shorts-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 20px 0;
+    }
+    @media(min-width: 768px) {
+      .shorts-preview { flex-direction: row; justify-content: center; align-items: flex-start; }
+    }
+    .phone-frame {
+      width: 320px;
+      height: 580px;
+      background: #000000;
+      border-radius: 36px;
+      border: 8px solid #334155;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+    .phone-notch {
+      width: 120px;
+      height: 18px;
+      background: #1E293B;
+      border-radius: 0 0 12px 12px;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+    }
+    .shorts-action-stack {
+      position: absolute;
+      right: 12px;
+      bottom: 70px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      z-index: 15;
+    }
+    .action-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    }
+    .action-label { font-size: 10px; font-weight: 800; color: white; margin-top: 2px; }
+
+    .shorts-bottom-info {
+      position: relative;
+      z-index: 15;
+      padding-right: 50px;
+      color: white;
+      margin-top: auto;
+    }
+    .shorts-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(0, 86, 210, 0.4);
+      border: 1px solid rgba(0, 86, 210, 0.8);
+      border-radius: 6px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .shorts-title { font-size: 13px; font-weight: 800; line-height: 1.3; }
+
+    /* Comparison Table */
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; background: white; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
+    th, td { padding: 14px 18px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--border); }
+    th { background: #F1F5F9; font-weight: 800; color: #334155; }
+    tr:last-child td { border-bottom: none; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .tag-green { background: #DCFCE7; color: #166534; }
+    .tag-blue { background: #DBEAFE; color: #1E40AF; }
+    .tag-red { background: #FEE2E2; color: #991B1B; }
+
+    /* 7 Sectors Strip */
+    .sectors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .sector-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .sector-icon { font-size: 24px; padding: 8px; background: #F8FAFC; border-radius: 10px; }
+
+    @media print {
+      .top-actions { display: none; }
+      body { background: white; color: black; padding: 0; }
+      .hero { box-shadow: none; border: 1px solid #ccc; color: black; background: #f0f4f8; }
+      .hero p { color: #333; }
+      .card { box-shadow: none; border: 1px solid #ccc; }
+      .mockup-container { background: #f8fafc; color: black; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Print/Save Action Bar -->
+  <div class="top-actions">
+    <h2>
+      <span>📘</span>
+      <span>Frontline LMS Ground-Up Rebuild Blueprint (Coursera + Udemy + YouTube Shorts)</span>
+    </h2>
+    <button class="print-btn" onclick="window.print()">
+      <span>🖨️</span>
+      <span>Print / Save as PDF</span>
+    </button>
+  </div>
+
+  <div class="container">
+
+    <!-- Hero Header -->
+    <div class="hero">
+      <div class="hero-badge">Master Engineering & UI/UX Plan</div>
+      <h1>Next-Gen Frontline Learning Platform</h1>
+      <p>
+        A ground-up rebuild replacing generic dashboard templates with the unmistakable exterior of <strong>Coursera & Udemy</strong> (course discovery, syllabus drawer, star ratings, and certified wage incentives) and the high-engagement interior of <strong>YouTube Shorts</strong> (9:16 vertical video, 11 Indian native languages, instant quizzes, and voice notes).
+      </p>
+    </div>
+
+    <!-- Section 1: The Core Problem & The Fix -->
+    <h2 class="section-title">1. Why Traditional LMSs Fail & How This Rebuild Solves It</h2>
+    <p class="section-subtitle">Comparing iGOT Karmayogi / standard corporate portals with our frontline-first architecture.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Capability / Feature</th>
+          <th>Traditional LMS (iGOT Karmayogi / Moodle)</th>
+          <th>Our Ground-Up LMS (Udemy + YouTube Shorts)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Access & Sign-In</strong></td>
+          <td>Corporate email + complex password (blocks 85% of frontline workers)</td>
+          <td><span class="tag tag-green">Zero-Email SSO:</span> Phone OTP or 1-second Camera Badge Scan</td>
+        </tr>
+        <tr>
+          <td><strong>Learning Medium</strong></td>
+          <td>45-page bureaucratic PDFs and 1-hour static slide lectures</td>
+          <td><span class="tag tag-green">YouTube Shorts:</span> 45–60s 9:16 vertical video demonstrations</td>
+        </tr>
+        <tr>
+          <td><strong>Language & Literacy</strong></td>
+          <td>Complex formal English or pure formal Hindi text</td>
+          <td><span class="tag tag-green">11 Indian Languages:</span> Synced vernacular audio narration + "Tap to Listen"</td>
+        </tr>
+        <tr>
+          <td><strong>Assessment Format</strong></td>
+          <td>Theoretical Multiple Choice (easy to guess or click-next)</td>
+          <td><span class="tag tag-green">Anti-Cheat:</span> Spot-the-Hazard image touch canvas + Practical Photo Proof</td>
+        </tr>
+        <tr>
+          <td><strong>Worker Motivation</strong></td>
+          <td>Vague compliance checkboxes with zero career impact</td>
+          <td><span class="tag tag-green">Wage Milestones:</span> "Tier 2 Unlock: +₹1,500/mo Site Allowance & ID Stamp"</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br /><br />
+
+    <!-- Section 2: Visual Experience Breakdown -->
+    <h2 class="section-title">2. Screen-by-Screen Visual Architecture</h2>
+    <p class="section-subtitle">Exact visual paradigms replicated from Coursera, Udemy, and YouTube Shorts.</p>
+
+    <div class="grid-2">
+      <!-- Udemy/Coursera Exterior -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background: #DBEAFE; color: #1E40AF;">📚</div>
+          <div>
+            <div class="card-title">Coursera & Udemy Exterior</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Web & Tablet Portal (/courses & /courses/:id)</div>
+          </div>
+        </div>
+        <ul style="padding-left: 20px; font-size: 13px; line-height: 1.8;">
+          <li><strong>Coursera Mega-Navigation:</strong> "Explore Catalog" classified by all 7 frontline sectors.</li>
+          <li><strong>Udemy Course Cards:</strong> 16:9 thumbnail, Bestseller tag, instructor credentials, star ratings (4.9 ★), and enrolled worker counts.</li>
+          <li><strong>Wage Incentive Badges:</strong> Every card highlights the exact monthly wage differential unlocked upon tier completion.</li>
+          <li><strong>Sticky Syllabus Drawer:</strong> Collapsible chapter accordion showing lesson checkmarks, durations, and progress meters.</li>
+          <li><strong>Practical Assignment Tab:</strong> Workers upload site photos and record mother-tongue voice notes.</li>
+        </ul>
+      </div>
+
+      <!-- YouTube Shorts Engine -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background: #FEE2E2; color: #991B1B;">⚡</div>
+          <div>
+            <div class="card-title">YouTube Shorts Vertical Engine</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Mobile & JIT Machine SOP (/shorts)</div>
+          </div>
+        </div>
+        <ul style="padding-left: 20px; font-size: 13px; line-height: 1.8;">
+          <li><strong>9:16 Vertical Snap-Scroll:</strong> Seamless gesture swiping up/down between bite-sized 45–60s micro-lessons.</li>
+          <li><strong>Right-Hand Action Column:</strong> Thumbs Up 👍, Dislike 👎, Shift Foreman Walkie-Talkie 💬, 30-Sec Quiz 🎯, Offline Download 📥, Share QR ↗️.</li>
+          <li><strong>Spinning Audio Vinyl Disc:</strong> Displays active native Indian language with real-time speech narration wave.</li>
+          <li><strong>Split-Screen Badging:</strong> Interactive [❌ WRONG WAY] vs. [✔️ RIGHT WAY] safety alert buttons.</li>
+          <li><strong>Machine QR Trigger:</strong> Scanning physical machine sticker launches its vertical Short directly.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- YouTube Shorts Phone Mockup -->
+    <div class="mockup-container">
+      <div class="mockup-header">
+        <div class="mockup-title">
+          <span>📱</span>
+          <span>YouTube Shorts Mobile Interface Mockup (/shorts)</span>
+        </div>
+        <span style="font-size: 12px; color: #94A3B8; font-family: monospace;">FULLSCREEN 9:16 ENGINE</span>
+      </div>
+
+      <div class="shorts-preview">
+        <!-- Phone 1: Vertical Short Video View -->
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; z-index: 15; padding-top: 10px;">
+            <span style="font-size: 10px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 12px; font-weight: 800;">← Back</span>
+            <span style="font-size: 10px; background: #0056D2; padding: 3px 8px; border-radius: 12px; font-weight: 800;">⚡ Shorts Feed</span>
+            <span style="font-size: 10px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 12px; font-weight: 800;">🔊 हिंदी 🇮🇳</span>
+          </div>
+
+          <div class="shorts-action-stack">
+            <div>
+              <div class="action-circle">❤️</div>
+              <div class="action-label">1.8k</div>
+            </div>
+            <div>
+              <div class="action-circle" style="background: #F59E0B; color: black;">🎯</div>
+              <div class="action-label">Quiz</div>
+            </div>
+            <div>
+              <div class="action-circle" style="background: #0056D2;">💬</div>
+              <div class="action-label">Foreman</div>
+            </div>
+            <div>
+              <div class="action-circle">📥</div>
+              <div class="action-label">Offline</div>
+            </div>
+          </div>
+
+          <div class="shorts-bottom-info">
+            <span class="shorts-badge">🏗️ Construction • Tier 2</span>
+            <div class="shorts-title">3-Point Contact on Scaffolding Ladders</div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <span style="background: rgba(239, 68, 68, 0.8); font-size: 9px; padding: 3px 6px; border-radius: 6px; font-weight: 800;">❌ WRONG: Hands full</span>
+              <span style="background: rgba(16, 185, 129, 0.8); font-size: 9px; padding: 3px 6px; border-radius: 6px; font-weight: 800;">✔️ RIGHT: Tool belt</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone 2: 30-Sec Instant Quiz Modal Popup -->
+        <div class="phone-frame" style="background: #0F172A; border-color: #475569;">
+          <div class="phone-notch"></div>
+          
+          <div style="z-index: 15; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+            <div style="font-size: 11px; font-weight: 800; color: #F59E0B;">⚡ 30-Sec Micro-Check</div>
+            <div style="font-size: 10px; font-mono; background: #1E293B; padding: 2px 8px; border-radius: 10px; color: #F59E0B;">⏱️ 24s</div>
+          </div>
+
+          <div style="z-index: 15; margin-top: 16px;">
+            <p style="font-size: 12px; font-weight: 700; color: white; line-height: 1.4;">
+              What is the mandatory action before reversing a forklift in a blind corridor?
+            </p>
+
+            <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="background: #1E293B; border: 1px solid #334155; padding: 10px; border-radius: 10px; font-size: 11px; color: #94A3B8;">
+                A. Speed up quickly to exit the zone
+              </div>
+              <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981; padding: 10px; border-radius: 10px; font-size: 11px; color: #A7F3D0; font-weight: 800;">
+                B. Sound horn twice & verify clear mirrors ✓
+              </div>
+              <div style="background: #1E293B; border: 1px solid #334155; padding: 10px; border-radius: 10px; font-size: 11px; color: #94A3B8;">
+                C. Look only at forward fork tips
+              </div>
+            </div>
+          </div>
+
+          <div style="z-index: 15; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 10px; border-radius: 12px; text-align: center;">
+            <div style="font-size: 11px; font-weight: 800; color: #34D399;">🎯 Correct! +50 XP Added</div>
+            <div style="font-size: 9px; color: #94A3B8; margin-top: 2px;">Skill Passport Updated with Shift Lead</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: The 7 Core Workforce Sectors -->
+    <h2 class="section-title">3. Standardized Coverage Across All 7 Core Sectors</h2>
+    <p class="section-subtitle">Industry taxonomy tailored to India's frontline and vocational workforce.</p>
+
+    <div class="sectors-grid">
+      <div class="sector-item">
+        <div class="sector-icon">🏗️</div>
+        <div>
+          <strong style="font-size: 14px;">1. Construction</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Masons, painters, welders, tile workers, concrete workers & helpers.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">⚡</div>
+        <div>
+          <strong style="font-size: 14px;">2. Skilled Technical</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Electricians, plumbers, carpenters, mechanics & HVAC technicians.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🏭</div>
+        <div>
+          <strong style="font-size: 14px;">3. Manufacturing & Factory</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Machine operators, assembly-line, production crew & quality inspectors.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🚚</div>
+        <div>
+          <strong style="font-size: 14px;">4. Transportation & Logistics</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Truck drivers, delivery agents, forklift pilots, warehouse staff & loaders.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🌾</div>
+        <div>
+          <strong style="font-size: 14px;">5. Agricultural & Allied</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Farmers, farm labourers, harvesters, dairy staff & plantation crews.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🧹</div>
+        <div>
+          <strong style="font-size: 14px;">6. Cleaning & Maintenance</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Housekeeping, cleaners, sanitation crew, gardeners & facility staff.</p>
+        </div>
+      </div>
+
+      <div class="sector-item">
+        <div class="sector-icon">🍳</div>
+        <div>
+          <strong style="font-size: 14px;">7. Hospitality & Service</strong>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Cooks, kitchen assistants, hotel housekeeping, laundry & catering.</p>
+        </div>
+      </div>
+    </div>
+
+    <br /><br />
+
+    <!-- Section 4: 4-Tier Progression & Wage Ladder -->
+    <h2 class="section-title">4. Four-Tier Skill Progression & Wage Ladders</h2>
+    <p class="section-subtitle">Real-world career advancement with verified digital skill passport credentials.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Skill Tier</th>
+          <th>Curriculum Focus</th>
+          <th>Verification Method</th>
+          <th>Wage & Career Benefit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Tier 1: Unskilled</strong></td>
+          <td>Basic site induction, 100% PPE compliance, zero energy awareness</td>
+          <td>Spot-the-Hazard Touch Quiz</td>
+          <td>Entry-level clearance to enter project jobsite</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 2: Semi-Skilled</strong></td>
+          <td>Equipment pre-shift SOPs, forklift reverse checks, machine guards</td>
+          <td>Visual Quiz + 1 Practical Photo</td>
+          <td><span class="tag tag-green">+₹1,200 to ₹1,500/month</span> machine allowance</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 3: Skilled</strong></td>
+          <td>Lockout-Tagout (LOTO), arc flash PPE, complex machinery operations</td>
+          <td>Field Photo Proof + Voice Note</td>
+          <td><span class="tag tag-green">+₹2,000 to ₹2,500/month</span> autonomous operator grade</td>
+        </tr>
+        <tr>
+          <td><strong>Tier 4: Highly-Skilled</strong></td>
+          <td>Toolbox talk coaching, substation diagnostics, emergency response</td>
+          <td>Supervisor In-Person Signature</td>
+          <td><span class="tag tag-green">+₹3,200/month</span> Shift Foreman / Lead Inspector status</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br /><br />
+
+    <!-- Section 5: Execution Commands & Verification -->
+    <h2 class="section-title">5. Quick Launch & Verification</h2>
+    <div class="card" style="background: #0F172A; color: white; border-color: #334155;">
+      <p style="font-size: 13px; color: #94A3B8; margin-bottom: 12px;">Run this command in the LMS root directory to launch the complete system:</p>
+      <pre style="background: #020617; padding: 14px; border-radius: 10px; font-family: monospace; font-size: 13px; color: #38BDF8; overflow-x: auto;">.\start-dev.bat</pre>
+      <div style="margin-top: 14px; font-size: 12px; color: #CBD5E1; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+        <div>⚡ <strong>YouTube Shorts:</strong> http://localhost:3000/shorts</div>
+        <div>📚 <strong>Udemy Catalog:</strong> http://localhost:3000/courses</div>
+        <div>👷 <strong>Worker Portal:</strong> http://localhost:3000/worker/dashboard</div>
+        <div>📋 <strong>Supervisor Tablet:</strong> http://localhost:3000/supervisor/dashboard</div>
+        <div>🛡️ <strong>Admin Compliance:</strong> http://localhost:3000/admin/compliance</div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

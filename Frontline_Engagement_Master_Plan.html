@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontline Engagement LMS - Master Implementation Plan (Udemy/Coursera + YouTube Shorts)</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-accent: #2563eb;
+      --secondary: #0d9488;
+      --dark: #0f172a;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #334155;
+      --text-muted: #64748b;
+      --shorts-red: #ef4444;
+      --success: #16a34a;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: var(--text); background-color: var(--bg); padding: 40px 20px; }
+    .container { max-width: 1080px; margin: 0 auto; background: var(--card-bg); padding: 52px; border-radius: 16px; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06); border: 1px solid var(--border); }
+    
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .btn-print { display: inline-flex; align-items: center; gap: 8px; background-color: var(--primary-accent); color: #ffffff; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); }
+    .btn-print:hover { background-color: #1d4ed8; }
+    
+    .header { border-bottom: 3px solid var(--primary); padding-bottom: 24px; margin-bottom: 36px; }
+    h1 { font-size: 2.2rem; color: var(--dark); line-height: 1.25; margin-bottom: 8px; }
+    .subtitle { font-size: 1.15rem; color: var(--text-muted); margin-bottom: 16px; }
+    .meta-bar { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.88rem; color: var(--text-muted); background: #f8fafc; padding: 12px 18px; border-radius: 8px; border: 1px solid var(--border); }
+
+    h2 { font-size: 1.55rem; color: var(--dark); margin-top: 40px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    h3 { font-size: 1.25rem; color: var(--primary); margin-top: 28px; margin-bottom: 12px; }
+    p { margin-bottom: 16px; }
+    ul, ol { margin-bottom: 20px; padding-left: 24px; }
+    li { margin-bottom: 8px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.95rem; }
+    th, td { padding: 12px 16px; border: 1px solid var(--border); text-align: left; }
+    th { background-color: #f1f5f9; color: var(--dark); font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fafc; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; margin: 24px 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 20px 0; }
+
+    /* Visual Mockups */
+    .mockup-container { background: #0f172a; color: white; border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid #334155; }
+    .phone-mockup { width: 320px; height: 580px; background: #000; border: 4px solid #334155; border-radius: 36px; margin: 0 auto; position: relative; overflow: hidden; display: flex; flex-col; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .phone-screen { width: 100%; height: 100%; position: relative; background: linear-gradient(180deg, #1e293b, #0f172a); display: flex; flex-direction: column; justify-content: space-between; padding: 16px; }
+
+    .callout { background-color: #eff6ff; border-left: 4px solid var(--primary-accent); padding: 18px 22px; margin: 24px 0; border-radius: 6px; }
+    .callout-warning { background-color: #fffbeb; border-left-color: var(--warning); }
+
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; }
+    .badge-unskilled { background: #f1f5f9; color: #475569; }
+    .badge-semi { background: #e0f2fe; color: #0369a1; }
+    .badge-skilled { background: #fef3c7; color: #92400e; }
+    .badge-high { background: #f3e8ff; color: #6b21a8; }
+
+    @media print {
+      body { background: #ffffff; padding: 0; }
+      .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+      .top-bar { display: none; }
+      h2, h3 { page-break-after: avoid; }
+      .mockup-container, table { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-bar">
+      <span style="font-weight: 800; text-transform: uppercase; font-size: 0.82rem; color: #0369a1; background: #e0f2fe; padding: 4px 12px; border-radius: 9999px;">
+        Architectural Blueprint: Udemy/Coursera + YouTube Shorts
+      </span>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        Save / Print as PDF
+      </button>
+    </div>
+
+    <header class="header">
+      <h1>Frontline LMS: Coursera/Udemy Structure + YouTube Shorts Engine</h1>
+      <p class="subtitle">An End-to-End Implementation Plan for Highly-Engaging Blue-Collar Learning Across 7 Sectors, 4 Skill Tiers, and 11 Native Indian Languages</p>
+      <div class="meta-bar">
+        <span><strong>Design Model:</strong> Udemy/Coursera Exterior + YouTube Shorts Feed</span>
+        <span><strong>Sectors:</strong> 7 Frontline Industries</span>
+        <span><strong>Languages:</strong> 11 Native Indian Languages</span>
+        <span><strong>Assignments:</strong> Photo Proof & Voice Notes</span>
+      </div>
+    </header>
+
+    <!-- SECTION 1: ARCHITECTURAL CONCEPT -->
+    <section>
+      <h2>1. The Hybrid Design: Coursera/Udemy Exterior + YouTube Shorts Interior</h2>
+      <p>To attract frontline laborers and eliminate drop-off, the application bridges two world-class paradigms:</p>
+
+      <div class="grid-2">
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 24px; border-top: 4px solid var(--primary-accent);">
+          <h3 style="margin-top: 0; color: var(--primary-accent);">🎓 Coursera & Udemy Style Portal</h3>
+          <p><strong>Professional, organized structure for courses, certifications, and career growth:</strong></p>
+          <ul>
+            <li><strong>7-Sector Course Catalog:</strong> Construction, Technical, Manufacturing, Logistics, Agriculture, Cleaning, Hospitality.</li>
+            <li><strong>Syllabus & Lesson Drawer:</strong> Clean chapter breakdown, progress tracking, and downloadable checklists.</li>
+            <li><strong>Wage & Milestone Incentives:</strong> Direct visibility into earning potential (e.g. <em>"Unlock Tier 2 &rarr; +₹1,500/mo allowance"</em>).</li>
+            <li><strong>Verifiable Digital Skill Passport:</strong> Portable, official QR-credential for career progression.</li>
+          </ul>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 24px; border-top: 4px solid var(--shorts-red);">
+          <h3 style="margin-top: 0; color: var(--shorts-red);">📱 YouTube Shorts / Reels Microlearning Engine</h3>
+          <p><strong>Addictive, bite-sized vertical video feed tailored for mobile workers:</strong></p>
+          <ul>
+            <li><strong>9:16 Vertical Video Snap-Feed:</strong> Workers swipe up/down through 60-second micro-lessons.</li>
+            <li><strong>Floating Action Bar:</strong> Instant 30-sec quiz button, ask-supervisor voice note, like counter.</li>
+            <li><strong>Split-Screen Badging:</strong> High-contrast <em>Wrong Way ❌ vs. Right Way ✔️</em> overlays.</li>
+            <li><strong>11 Indian Native Languages:</strong> Persistent audio switcher ("Tap to Listen") with native dialects.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: SHORTS MOCKUP -->
+    <section>
+      <h2>2. Visual Experience: The YouTube Shorts Learning Feed (`/shorts`)</h2>
+      <p>How the vertical video player looks and functions on the frontline worker's mobile phone:</p>
+
+      <div class="mockup-container">
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <!-- Top Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; z-index: 10;">
+              <span style="font-size: 0.75rem; font-weight: 800; background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.2);">
+                ⚡ SAFETY SHORT
+              </span>
+              <span style="font-size: 0.75rem; font-weight: 800; background: #2563eb; color: white; padding: 4px 10px; border-radius: 9999px;">
+                🔊 हिंदी 🇮🇳
+              </span>
+            </div>
+
+            <!-- Floating Right Action Bar -->
+            <div style="position: absolute; right: 14px; bottom: 100px; display: flex; flex-direction: column; gap: 14px; align-items: center; z-index: 10;">
+              <div style="text-align: center;">
+                <div style="width: 42px; height: 42px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.2);">
+                  ❤️
+                </div>
+                <span style="font-size: 0.65rem; font-weight: bold;">1.4k</span>
+              </div>
+
+              <div style="text-align: center;">
+                <div style="width: 42px; height: 42px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.2);">
+                  💬
+                </div>
+                <span style="font-size: 0.65rem; font-weight: bold;">Ask Foreman</span>
+              </div>
+
+              <div style="text-align: center;">
+                <div style="width: 44px; height: 44px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);">
+                  🎯
+                </div>
+                <span style="font-size: 0.65rem; font-weight: bold; color: #facc15;">30s Quiz</span>
+              </div>
+
+              <div style="text-align: center;">
+                <div style="width: 42px; height: 42px; background: rgba(0,0,0,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.2);">
+                  💾
+                </div>
+                <span style="font-size: 0.65rem; font-weight: bold;">Offline</span>
+              </div>
+            </div>
+
+            <!-- Bottom Content Overlay -->
+            <div style="z-index: 10; padding-bottom: 8px;">
+              <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                <span style="font-size: 0.65rem; background: rgba(220, 38, 38, 0.8); color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">
+                  ❌ WRONG: Live Breaker
+                </span>
+                <span style="font-size: 0.65rem; background: rgba(22, 163, 74, 0.8); color: white; padding: 2px 8px; border-radius: 4px; font-weight: bold;">
+                  ✔️ RIGHT: LOTO Tag
+                </span>
+              </div>
+
+              <h4 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 4px; line-height: 1.2;">
+                Lockout / Tagout (LOTO) in 45 Seconds
+              </h4>
+              <p style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">
+                Manufacturing &bull; Tier 2: Semi-Skilled
+              </p>
+
+              <!-- Progress Bar -->
+              <div style="width: 100%; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;">
+                <div style="width: 65%; height: 100%; background: #ef4444;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: 7 SECTORS & 4 TIERS -->
+    <section>
+      <h2>3. The 7 Industry Sectors & 4-Tier Skill Level Taxonomy</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Sector</th>
+            <th>Sample Trades & Roles</th>
+            <th>Skill Tier Range</th>
+            <th>Primary Hands-On Assignment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>🏗️ 1. Construction</strong></td>
+            <td>Masons, painters, welders, tile workers, concrete workers, helpers</td>
+            <td><span class="badge badge-unskilled">Tier 1</span> to <span class="badge badge-skilled">Tier 3</span></td>
+            <td>Photo proof of level alignment & welded seam inspection</td>
+          </tr>
+          <tr>
+            <td><strong>⚡ 2. Skilled Technical</strong></td>
+            <td>Electricians, plumbers, carpenters, mechanics, HVAC technicians</td>
+            <td><span class="badge badge-semi">Tier 2</span> to <span class="badge badge-high">Tier 4</span></td>
+            <td>Photo proof of circuit wiring + Voice diagnostic explanation</td>
+          </tr>
+          <tr>
+            <td><strong>🏭 3. Manufacturing</strong></td>
+            <td>Machine operators, assembly line, production, quality inspectors</td>
+            <td><span class="badge badge-semi">Tier 2</span> to <span class="badge badge-high">Tier 4</span></td>
+            <td>Machine pre-check walkaround + Defect spot-the-hazard</td>
+          </tr>
+          <tr>
+            <td><strong>🚚 4. Logistics & Transport</strong></td>
+            <td>Truck drivers, delivery agents, forklift operators, warehouse loaders</td>
+            <td><span class="badge badge-unskilled">Tier 1</span> to <span class="badge badge-skilled">Tier 3</span></td>
+            <td>Forklift safety check & pallet load distribution photo</td>
+          </tr>
+          <tr>
+            <td><strong>🌾 5. Agriculture</strong></td>
+            <td>Farmers, farm labourers, harvesters, dairy workers, plantation crew</td>
+            <td><span class="badge badge-unskilled">Tier 1</span> to <span class="badge badge-semi">Tier 2</span></td>
+            <td>Pesticide PPE check & equipment safety voice note</td>
+          </tr>
+          <tr>
+            <td><strong>🧹 6. Cleaning & Maintenance</strong></td>
+            <td>Housekeeping staff, cleaners, sanitation workers, gardeners</td>
+            <td><span class="badge badge-unskilled">Tier 1</span> to <span class="badge badge-semi">Tier 2</span></td>
+            <td>Chemical HazCom pictogram identification & sanitation log</td>
+          </tr>
+          <tr>
+            <td><strong>🍳 7. Hospitality & Services</strong></td>
+            <td>Cooks, kitchen assistants, hotel housekeeping, laundry, catering</td>
+            <td><span class="badge badge-unskilled">Tier 1</span> to <span class="badge badge-skilled">Tier 3</span></td>
+            <td>Food safety temperature check & hygiene inspection photo</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SECTION 4: ASSIGNMENTS ENGINE -->
+    <section>
+      <h2>4. Hands-on Practical Field Assignments Engine</h2>
+      <div class="grid-3">
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; border-top: 4px solid var(--primary-accent);">
+          <h4>📸 Photo Proof Assignment</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Worker captures a photo of physical work (welded joint, wire termination, tile alignment). Automatically compressed on-device (&lt;500 KB) and pushed to supervisor review queue.</p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; border-top: 4px solid #7c3aed;">
+          <h4>🎙️ Audio Voice Response</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Low-literacy workers tap "Record Audio" and speak for 30–60 seconds in their native tongue explaining emergency cutoff or machine pre-check steps.</p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; border-top: 4px solid #16a34a;">
+          <h4>🎯 Spot the Hazard Touch Game</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Interactive image canvas where workers tap directly on 3 safety hazards in a high-resolution photograph with instant audio feedback.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: ADMIN & SUPERVISOR TOOLS -->
+    <section>
+      <h2>5. Admin & Supervisor Management Tools</h2>
+      <ul>
+        <li><strong>Category-Wise & Person-Wise Analytics:</strong> Admin can view macro health by sector (e.g. <em>Construction: 84% certified</em>) or drill down to a single worker's profile (<em>Ramesh Kumar: 4 modules passed, Tier 2 unlocked</em>).</li>
+        <li><strong>Admin Shorts & Course Studio:</strong> Upload 9:16 vertical videos, attach audio tracks across 11 Indian languages, configure quiz coordinates, and set skill tier.</li>
+        <li><strong>Supervisor Shift Tablet Mode:</strong> Morning Toolbox Talk player with 1-click group attendance confirmation and practical observation signature canvas.</li>
+        <li><strong>1-Click OSHA / Labor Audit Export:</strong> Downloadable, tamper-proof PDF audit dossier containing verified completion timestamps and digital signatures.</li>
+      </ul>
+    </section>
+
+    <footer style="margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+      Frontline LMS • Master Implementation Plan v2.0 • Ready for Print and PDF Export
+    </footer>
+  </div>
+
+</body>
+</html>

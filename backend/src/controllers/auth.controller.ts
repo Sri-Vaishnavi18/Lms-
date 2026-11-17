@@ -60,18 +60,33 @@ export class AuthController {
    */
   public static async register(req: Request, res: Response) {
     try {
-      const { fullName, phoneNumber, password, role = 'WORKER', sector = 'CONSTRUCTION', trade, preferredLanguage = 'en' } = req.body;
+      let { fullName, phoneNumber, password, role = 'WORKER', sector = 'CONSTRUCTION', trade, preferredLanguage = 'en' } = req.body;
 
       if (!fullName || !phoneNumber || !password) {
         return res.status(400).json({ error: 'Full name, phone number, and password are required' });
       }
 
-      const existing = await prisma.user.findUnique({
-        where: { phoneNumber },
+      // Normalize phone number
+      phoneNumber = phoneNumber.trim().replace(/\s+/g, '');
+      if (!phoneNumber.startsWith('+') && phoneNumber.length === 10) {
+        phoneNumber = `+91${phoneNumber}`;
+      }
+
+      // Check if phone or variant already exists
+      const phoneDigits10 = phoneNumber.slice(-10);
+      const existing = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { phoneNumber },
+            { phoneNumber: { contains: phoneDigits10 } },
+          ],
+        },
       });
 
       if (existing) {
-        return res.status(409).json({ error: 'An account with this phone number already exists. Please log in.' });
+        return res.status(409).json({ 
+          error: `An account with phone number ${existing.phoneNumber} already exists (${existing.fullName}, Badge ID: ${existing.badgeId}). Please log in directly.` 
+        });
       }
 
       const badgePrefix = role === 'ADMIN' ? 'ADM' : role === 'SUPERVISOR' ? 'SUP' : 'BC';
@@ -120,7 +135,7 @@ export class AuthController {
       });
     } catch (err: any) {
       console.error('register error:', err);
-      return res.status(500).json({ error: 'Failed to complete registration' });
+      return res.status(500).json({ error: `Registration error: ${err.message || 'Failed to complete registration'}` });
     }
   }
 
@@ -259,9 +274,17 @@ export class AuthController {
         return res.status(400).json({ error: 'Badge ID/Phone and password are required' });
       }
 
+      const trimmedId = identifier.trim();
+      const phoneDigits10 = trimmedId.replace(/\D/g, '').slice(-10);
+
       const user = await prisma.user.findFirst({
         where: {
-          OR: [{ badgeId: identifier }, { phoneNumber: identifier }],
+          OR: [
+            { badgeId: trimmedId },
+            { badgeId: trimmedId.toUpperCase() },
+            { phoneNumber: trimmedId },
+            ...(phoneDigits10.length === 10 ? [{ phoneNumber: { contains: phoneDigits10 } }] : []),
+          ],
         },
       });
 
